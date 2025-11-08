@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Comment - Wild West Forum</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+</head>
+<body>
+    <div class="container">
+        {{> nav }}
+        <main>
+            <div class="new-comment-page">
+                <h2>Post a New Comment</h2>
+                <form action="/comment" method="POST" class="comment-form">
+                    <div class="form-group">
+                        <label for="text">Your Comment:</label>
+                        <textarea id="text" name="text" rows="6" required placeholder="Say whatever you want... no validation here!"></textarea>
+                        <small class="warning-text">Warning: No input validation or XSS protection!</small>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Post Comment</button>
+                        <a href="/comments" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+        {{> footer }}
+    </div>
+</body>
+</html>

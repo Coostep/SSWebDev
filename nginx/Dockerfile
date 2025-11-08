@@ -1,6 +1,10 @@
 FROM nginx:alpine
 
-COPY default.conf /etc/nginx/conf.d/default.conf
+# Remove default configuration
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Copy our custom configuration
+COPY nginx.conf /etc/nginx/conf.d/
 
 EXPOSE 80
 

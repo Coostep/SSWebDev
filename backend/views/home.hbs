@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wild West Forum</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        {{> nav }}
+        
+        <main>
+            <div class="home-page">
+                <div class="hero">
+                    <h1>Welcome to the Wild West Forum! 🤠</h1>
+                    <p class="subtitle">The most insecure forum this side of the Mississippi</p>
+                </div>
+
+                <div class="features">
+                    <div class="feature-card">
+                        <h3>🚨 Plaintext Passwords</h3>
+                        <p>We store your passwords in plaintext because who needs security?</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>🍪 Cookie-based Sessions</h3>
+                        <p>Our custom session management is wide open for the taking!</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>📝 No Input Validation</h3>
+                        <p>Post whatever you want - we don't check anything!</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3>🎯 XSS Welcome</h3>
+                        <p>Cross-site scripting? More like cross-site fun-scripting!</p>
+                    </div>
+                </div>
+
+                <div class="cta">
+                    {{#if currentUser}}
+                        <a href="/comment/new" class="btn btn-primary">Post a Comment</a>
+                        <a href="/comments" class="btn btn-secondary">View Comments</a>
+                    {{else}}
+                        <a href="/register" class="btn btn-primary">Join the Frontier</a>
+                        <a href="/login" class="btn btn-secondary">Saddle Up</a>
+                    {{/if}}
+                </div>
+            </div>
+        </main>
+        
+        {{> footer }}
+    </div>
+</body>
+</html>
