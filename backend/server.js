@@ -1,49 +1,52 @@
+// Server.js
+
+
+// Importing modules
+
 const express = require('express');
 const hbs = require('hbs');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 
-
+//  Initializng express and hard setting port
 const app = express();
 const PORT = 3000;
 
-
+// Temp in-memory storage 
 const users = [];
 const comments = [];
 const sessions = {};
 
-
+// Configure view templating settings and hbs
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
-
-
 hbs.registerPartials(path.join(__dirname, 'views', 'partials'));
 
-
+// Set up middleware
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-
+// Setting up session IDs
 app.use((req, res, next) => {
     let sessionId = req.cookies.sessionId;
 
-
+    // Create a new session if one doesnt exist
     if (!sessionId || !sessions[sessionId]) {
-        sessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-        sessions[sessionId] = {
+        sessionId = Math.random().toString(36).substring(6,7);
+	sessions[sessionId] = {
             user: null,
             visitCount: 0,
             createdAt: new Date()
         };
 
-
+	// Set session cookie for 24 hours
         res.cookie('sessionId', sessionId, {
-            maxAge: 24 * 60 * 60 * 1000 // 24 hours
+            maxAge: 24 * 60 * 60 * 1000
         });
     }
 
-
+    // Attatch session to req 
     req.session = sessions[sessionId];
     req.sessionId = sessionId;
 
@@ -54,33 +57,26 @@ app.use((req, res, next) => {
     next();
 });
 
-
-app.set('view engine', 'hbs');
-app.set('views', path.join(__dirname, 'views'));
-
-
-hbs.registerPartials(path.join(__dirname, 'views/partials'));
-
-
+// Regist hbs helper for json formatting
 hbs.registerHelper('stringify', function(context) {
     return JSON.stringify(context, null, 2);
 });
 
-
+// make all user data available
 app.use((req, res, next) => {
     res.locals.currentUser = req.session.user || null;
     res.locals.sessionId = req.sessionId;
     next();
 });
 
-
+// handling routes
 app.get('/', (req, res) => {
     res.render('home', {
         title: 'Wild West Forum - Home'
     });
 });
 
-
+// registation routes
 app.get('/register', (req, res) => {
     res.render('register', {
         title: 'Register',
@@ -92,7 +88,7 @@ app.get('/register', (req, res) => {
 app.post('/register', (req, res) => {
     const { username, password } = req.body;
 
-
+    // check if username already exists
     if (users.find(u => u.username === username)) {
         return res.render('register', {
             title: 'Register',
@@ -100,7 +96,7 @@ app.post('/register', (req, res) => {
         });
     }
 
-
+    // Creates new user
     users.push({ username, password });
     console.log(`New user registered: ${username}, Password: ${password}`);
 
@@ -108,7 +104,7 @@ app.post('/register', (req, res) => {
     res.redirect('/login');
 });
 
-
+// login route
 app.get('/login', (req, res) => {
     res.render('login', {
         title: 'Login',
@@ -120,7 +116,7 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
-
+    // find mathing user
     const user = users.find(u => u.username === username && u.password === password);
 
 
@@ -131,7 +127,7 @@ app.post('/login', (req, res) => {
         });
     }
 
-
+    // create session
     req.session.user = username;
     req.session.loginTime = new Date();
 
@@ -142,18 +138,16 @@ app.post('/login', (req, res) => {
     res.redirect('/');
 });
 
-
+// logout route
 app.post('/logout', (req, res) => {
     const username = req.session.user;
 
-
+    // clear session data
     req.session.user = null;
     delete req.session.loginTime;
 
-
+    // clear client cookies and server session
     res.clearCookie('sessionId');
-
-
     delete sessions[req.sessionId];
 
 
@@ -161,7 +155,7 @@ app.post('/logout', (req, res) => {
     res.redirect('/');
 });
 
-
+// comments route
 app.get('/comments', (req, res) => {
     res.render('comments', {
         title: 'All Comments',
@@ -169,7 +163,7 @@ app.get('/comments', (req, res) => {
     });
 });
 
-
+// new comment route
 app.get('/comment/new', (req, res) => {
     if (!req.session.user) {
         return res.redirect('/login');
@@ -181,7 +175,7 @@ app.get('/comment/new', (req, res) => {
     });
 });
 
-
+// comment creation route
 app.post('/comment', (req, res) => {
     if (!req.session.user) {
         return res.redirect('/login');
@@ -190,7 +184,7 @@ app.post('/comment', (req, res) => {
 
     const { text } = req.body;
 
-
+    // add comments to storage
     comments.push({
         author: req.session.user,
         text: text,
@@ -203,7 +197,7 @@ app.post('/comment', (req, res) => {
 
     res.redirect('/comments');
 });
-
+// makes sure server is working on right port
 app.listen(PORT, () => {
     console.log(`Wild West Forum running on port ${PORT}`);
 });

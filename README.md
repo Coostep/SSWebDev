@@ -4,6 +4,7 @@ This is a deliberately insecure web forum built for educational purposes.
 
 ## Running the application
 
+<<<<<<< HEAD
 1. Clone the repository.
    - git clone https://github.com/Coostep/SSWebDev
 2. Ensure Docker and Docker Compose are installed.
@@ -19,3 +20,8 @@ This is a deliberately insecure web forum built for educational purposes.
 ## Security Note
 
 Children under 2 years of age should not be given any access to docker and nginx, it will ruin their childhood.
+=======
+## Quick Start
+```bash
+docker-compose up --build
+>>>>>>> f9ff664 (Adding comments bc i forgor)
