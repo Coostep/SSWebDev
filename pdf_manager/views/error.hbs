@@ -1,0 +1,16 @@
+{{> header title=title}}
+
+        <div class="container">
+            <div class="error-page">
+                <div class="error-icon">⚠️</div>
+                <h1>{{title}}</h1>
+                <p class="error-message">{{message}}</p>
+                <div class="error-actions">
+                    <a href="/" class="btn btn-primary">Go Home</a>
+                    <a href="/library" class="btn btn-outline">Browse Library</a>
+                    <button onclick="history.back()" class="btn btn-secondary">Go Back</button>
+                </div>
+            </div>
+        </div>
+
+{{> footer}}

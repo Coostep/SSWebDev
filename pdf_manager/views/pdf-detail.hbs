@@ -1,0 +1,90 @@
+{{> header title=title}}
+
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="/">Home</a> &gt; 
+                <a href="/library">Library</a> &gt; 
+                <span>PDF Details</span>
+            </div>
+
+            <div class="pdf-detail">
+                <div class="pdf-detail-header">
+                    <div class="pdf-meta-badges">
+                        <span class="pdf-category {{pdf.category}}">{{pdf.category}}</span>
+                        {{#if pdf.assignment_number}}
+                        <span class="pdf-assignment">Assignment {{pdf.assignment_number}}</span>
+                        {{/if}}
+                    </div>
+                    <h1>{{pdf.display_title}}</h1>
+                    <div class="pdf-actions">
+                        <a href="/download/{{pdf.filename}}" class="btn btn-primary btn-large">Download PDF</a>
+                        <a href="/library" class="btn btn-outline">Back to Library</a>
+                    </div>
+                </div>
+
+                <div class="pdf-detail-content">
+                    <div class="detail-section">
+                        <h2>Description</h2>
+                        <p>{{pdf.description}}</p>
+                    </div>
+
+                    <div class="detail-grid">
+                        <div class="detail-card">
+                            <h3>Document Information</h3>
+                            <dl class="detail-list">
+                                <dt>Filename:</dt>
+                                <dd>{{pdf.filename}}</dd>
+                                
+                                <dt>Category:</dt>
+                                <dd>{{pdf.category}}</dd>
+                                
+                                {{#if pdf.assignment_number}}
+                                <dt>Assignment Number:</dt>
+                                <dd>{{pdf.assignment_number}}</dd>
+                                {{/if}}
+                                
+                                {{#if pdf.due_date}}
+                                <dt>Due Date:</dt>
+                                <dd>{{formatDate pdf.due_date}}</dd>
+                                {{/if}}
+                                
+                                {{#if pdf.file_size}}
+                                <dt>File Size:</dt>
+                                <dd>{{pdf.file_size}} bytes</dd>
+                                {{/if}}
+                                
+                                {{#if pdf.page_count}}
+                                <dt>Page Count:</dt>
+                                <dd>{{pdf.page_count}} pages</dd>
+                                {{/if}}
+                                
+                                <dt>Added:</dt>
+                                <dd>{{formatDate pdf.created_at}}</dd>
+                                
+                                <dt>Last Updated:</dt>
+                                <dd>{{formatDate pdf.updated_at}}</dd>
+                            </dl>
+                        </div>
+
+                        <div class="detail-card">
+                            <h3>Download & Access</h3>
+                            <div class="access-info">
+                                <p>This document is available for secure download. Click the download button above to get your copy.</p>
+                                
+                                <div class="security-notice">
+                                    <h4>🔒 Security Features</h4>
+                                    <ul>
+                                        <li>File validation before serving</li>
+                                        <li>Path traversal protection</li>
+                                        <li>Secure download handling</li>
+                                        <li>HTTPS encryption</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{{> footer}}

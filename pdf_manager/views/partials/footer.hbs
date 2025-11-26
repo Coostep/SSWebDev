@@ -1,0 +1,50 @@
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>COS 498</h3>
+                    <p>Advanced Web Development</p>
+                    <p>University of Maine</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/library">PDF Library</a></li>
+                        <li><a href="/about">About</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="/library?category=Homework">Homework</a></li>
+                        <li><a href="/library?category=Project">Projects</a></li>
+                        <li><a href="/library?category=Exam">Exams</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 University of Maine - COS 498. Secure PDF Server Assignment.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Helper functions for Handlebars
+        const helpers = {
+            formatDate: (dateString) => {
+                if (!dateString) return 'No due date';
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            },
+            eq: (a, b) => a === b
+        };
+    </script>
+</body>
+</html>

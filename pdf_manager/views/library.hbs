@@ -1,0 +1,72 @@
+{{> header title=title}}
+
+        <div class="container">
+            <div class="page-header">
+                <h1>PDF Library</h1>
+                <p>Browse and download all available course documents</p>
+            </div>
+
+            <div class="library-controls">
+                <div class="category-filter">
+                    <label for="category-select">Filter by Category:</label>
+                    <select id="category-select" onchange="window.location.href=this.value">
+                        <option value="/library?category=all" {{#if (eq currentCategory 'all')}}selected{{/if}}>
+                            All Categories ({{totalCount}})
+                        </option>
+                        {{#each categories}}
+                        <option value="/library?category={{this.category}}" 
+                                {{#if (eq ../currentCategory this.category)}}selected{{/if}}>
+                            {{this.category}} ({{this.count}})
+                        </option>
+                        {{/each}}
+                    </select>
+                </div>
+            </div>
+
+            {{#if pdfs.length}}
+            <div class="pdf-grid">
+                {{#each pdfs}}
+                <div class="pdf-card">
+                    <div class="pdf-card-header">
+                        <span class="pdf-category {{this.category}}">{{this.category}}</span>
+                        {{#if this.assignment_number}}
+                        <span class="pdf-assignment">Assignment {{this.assignment_number}}</span>
+                        {{/if}}
+                    </div>
+                    <div class="pdf-card-body">
+                        <h3>{{this.display_title}}</h3>
+                        <p class="pdf-description">{{this.description}}</p>
+                        <div class="pdf-meta">
+                            {{#if this.due_date}}
+                            <div class="meta-item">
+                                <strong>Due:</strong> {{formatDate this.due_date}}
+                            </div>
+                            {{/if}}
+                            {{#if this.file_size}}
+                            <div class="meta-item">
+                                <strong>Size:</strong> {{this.file_size}} bytes
+                            </div>
+                            {{/if}}
+                            <div class="meta-item">
+                                <strong>Added:</strong> {{formatDate this.created_at}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pdf-card-actions">
+                        <a href="/pdf/{{this.id}}" class="btn btn-outline">View Details</a>
+                        <a href="/download/{{this.filename}}" class="btn btn-primary">Download PDF</a>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+            {{else}}
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <h3>No PDFs Found</h3>
+                <p>No documents found for the selected category.</p>
+                <a href="/library" class="btn btn-primary">View All Documents</a>
+            </div>
+            {{/if}}
+        </div>
+
+{{> footer}}
