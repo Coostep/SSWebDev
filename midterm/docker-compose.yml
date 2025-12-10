@@ -1,17 +1,27 @@
 services:
-  nginx:
-    build: ./nginx
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
+  # Node.js Express application
+  backend-nodejs:
+    build: ./backend
+    container_name: backend-nodejs
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
     networks:
       - app-network
 
-  backend:
-    build: ./backend
-    environment:
-      - PORT=3000
+  # Nginx Proxy Manager
+  nginx-proxy-manager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    ports:
+      - '80:80'      # HTTP traffic
+      - '443:443'    # HTTPS traffic
+      - '5001:81'    # Admin web interface, pick an unusual port for security
+    volumes: # place to store all the data that we need persistant and external
+      - ./nginx/data:/data
+      - ./nginx/letsencrypt:/etc/letsencrypt
     networks:
       - app-network
 
