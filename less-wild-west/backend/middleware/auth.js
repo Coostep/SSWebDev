@@ -1,4 +1,5 @@
 /*
-    This auth.js middleware is responsible for handling authentication
-    for incoming requests. It checks for a valid token in the request headers.
+    auth.js
+    This middleware file contains security-related middleware functions for the application.
+    It includes functions for validating API keys and enforcing HTTPS connections.
 */
