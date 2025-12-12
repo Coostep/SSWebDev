@@ -1,3 +1,0 @@
-/*
-    This email.js file contains utility functions for sending emails using Node.js and Nodemailer.
-*/
