@@ -1,4 +1,9 @@
-// Server.js
+/*
+server.js file for Less Wild West backend
+This file sets up the Express server, configures middleware,
+handles routing, and manages user sessions.
+*/
+
 
 
 // Importing modules

@@ -1,0 +1,5 @@
+/*
+Database.js file for Less Wild West backend
+This file handles the connection to the database and provides
+functions to interact with the database.
+*/
