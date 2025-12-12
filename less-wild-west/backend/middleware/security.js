@@ -1,0 +1,4 @@
+/*
+    This security.js middleware is responsible for enforcing security
+    policies for incoming requests. It checks for necessary security headers.
+*/
