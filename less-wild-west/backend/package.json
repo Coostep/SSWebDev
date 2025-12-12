@@ -18,9 +18,13 @@
   },
   "homepage": "https://github.com/Coostep/SSWebDev#readme",
   "dependencies": {
-    "cookie-parser": "^1.4.7",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
-    "hbs": "^4.2.0"
+    "hbs": "^4.2.0",
+    "cookie-parser": "^1.4.7",
+    "better-sqlite3": "^11.8.1",
+    "argon2": "^0.41.0",
+    "socket.io": "^4.8.1",
+    "nodemailer": "^6.9.15"
   }
 }
