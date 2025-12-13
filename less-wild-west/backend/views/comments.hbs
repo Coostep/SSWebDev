@@ -8,8 +8,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comments - Wild West Forum</title>
-    <link rel="stylesheet" href="../../css/styles.css">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
     <div class="container">
@@ -17,29 +17,102 @@
         <main>
             <div class="comments-page">
                 <h2>All Comments</h2>
+                
                 {{#if currentUser}}
                     <div class="new-comment-link">
-                        <a href="/comment/new" class="btn btn-primary">Post New Comment</a>
+                        <a href="/comments/new" class="btn btn-primary">Post New Comment</a>
                     </div>
                 {{/if}}
+                
+                {{#if pagination}}
+                    <div class="pagination-info">
+                        <p>Page {{pagination.page}} of {{pagination.totalPages}} ({{pagination.total}} total comments)</p>
+                    </div>
+                {{/if}}
+                
                 <div class="comments-list">
                     {{#each comments}}
-                        <div class="comment-card">
-                            <div class="comment-header">
-                                <strong class="comment-author">{{this.author}}</strong>
-                                <span class="comment-date">{{this.createdAt}}</span>
-                            </div>
-                            <div class="comment-text">{{{this.text}}}</div>
-                        </div>
+                        {{> comment comment=this currentUser=../currentUser}}
                     {{else}}
                         <div class="no-comments">
                             <p>No comments yet. Be the first to post!</p>
                         </div>
                     {{/each}}
                 </div>
+                
+                {{#if pagination}}
+                    <div class="pagination-controls">
+                        {{#if pagination.hasPrev}}
+                            <a href="/comments?page={{pagination.prevPage}}&limit={{pagination.limit}}" class="btn btn-secondary">Previous</a>
+                        {{/if}}
+                        
+                        <div class="page-numbers">
+                            {{#range 1 pagination.totalPages}}
+                                {{#if (eq this ../pagination.page)}}
+                                    <span class="current-page">{{this}}</span>
+                                {{else}}
+                                    <a href="/comments?page={{this}}&limit={{../pagination.limit}}" class="page-link">{{this}}</a>
+                                {{/if}}
+                            {{/range}}
+                        </div>
+                        
+                        {{#if pagination.hasNext}}
+                            <a href="/comments?page={{pagination.nextPage}}&limit={{pagination.limit}}" class="btn btn-secondary">Next</a>
+                        {{/if}}
+                    </div>
+                {{/if}}
             </div>
         </main>
         {{> footer }}
     </div>
+    
+    <script>
+        // Handle comment voting
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.vote-btn').forEach(button => {
+                button.addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    const commentId = this.dataset.commentId;
+                    const voteType = this.dataset.vote;
+                    
+                    try {
+                        const response = await fetch(`/comments/${commentId}/vote`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ vote: voteType })
+                        });
+                        
+                        const data = await response.json();
+                        if (data.success) {
+                            // Update vote count
+                            const voteCount = document.querySelector(`.vote-count[data-comment-id="${commentId}"]`);
+                            if (voteCount) {
+                                voteCount.textContent = data.votes;
+                            }
+                            
+                            // Update button states
+                            const upBtn = document.querySelector(`.vote-up[data-comment-id="${commentId}"]`);
+                            const downBtn = document.querySelector(`.vote-down[data-comment-id="${commentId}"]`);
+                            
+                            if (data.userVote === 1) {
+                                upBtn.classList.add('active');
+                                downBtn.classList.remove('active');
+                            } else if (data.userVote === -1) {
+                                downBtn.classList.add('active');
+                                upBtn.classList.remove('active');
+                            } else {
+                                upBtn.classList.remove('active');
+                                downBtn.classList.remove('active');
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error voting:', error);
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

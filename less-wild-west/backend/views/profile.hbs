@@ -2,3 +2,158 @@
     This profile.hbs file is a Handlebars template for rendering user profile pages in the Less Wild West application.
     It displays user information such as username, email, and profile picture.
 -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        {{> nav }}
+        <main>
+            <div class="profile-page">
+                {{#if success}}
+                    <div class="success-message">{{success}}</div>
+                {{/if}}
+                
+                {{#if error}}
+                    <div class="error-message">{{error}}</div>
+                {{/if}}
+                
+                <h2>My Profile</h2>
+                
+                <div class="profile-sections">
+                    <!-- Profile Display -->
+                    <div class="profile-section">
+                        <h3>Profile Information</h3>
+                        <div class="profile-display">
+                            <div class="profile-header">
+                                <span class="profile-icon-large">{{user.profile_icon}}</span>
+                                <div>
+                                    <h2 style="color: {{user.profile_color}};">{{user.display_name}}</h2>
+                                    <p>@{{user.username}}</p>
+                                    <p><small>Member since {{formatDate user.created_at}}</small></p>
+                                </div>
+                            </div>
+                            <div class="profile-bio">
+                                <p>{{user.bio}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Account Management -->
+                    <div class="profile-section">
+                        <h3>Account Management</h3>
+                        
+                        <!-- Change Password -->
+                        <div class="profile-form">
+                            <h4>Change Password</h4>
+                            <form action="/profile/password" method="POST">
+                                <div class="form-group">
+                                    <label for="currentPassword">Current Password:</label>
+                                    <input type="password" id="currentPassword" name="currentPassword" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newPassword">New Password:</label>
+                                    <input type="password" id="newPassword" name="newPassword" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="confirmPassword">Confirm New Password:</label>
+                                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update Password</button>
+                            </form>
+                        </div>
+                        
+                        <!-- Change Email -->
+                        <div class="profile-form">
+                            <h4>Change Email</h4>
+                            <form action="/profile/email" method="POST">
+                                <div class="form-group">
+                                    <label for="currentPasswordEmail">Current Password:</label>
+                                    <input type="password" id="currentPasswordEmail" name="currentPassword" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newEmail">New Email:</label>
+                                    <input type="email" id="newEmail" name="newEmail" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="confirmEmail">Confirm Email:</label>
+                                    <input type="email" id="confirmEmail" name="confirmEmail" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update Email</button>
+                            </form>
+                        </div>
+                        
+                        <!-- Change Display Name -->
+                        <div class="profile-form">
+                            <h4>Change Display Name</h4>
+                            <form action="/profile/display-name" method="POST">
+                                <div class="form-group">
+                                    <label for="displayName">New Display Name:</label>
+                                    <input type="text" id="displayName" name="displayName" value="{{user.display_name}}" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update Display Name</button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Profile Customization -->
+                    <div class="profile-section">
+                        <h3>Profile Customization</h3>
+                        <form action="/profile/customization" method="POST" class="profile-form">
+                            <div class="form-group">
+                                <label for="profileColor">Profile Color:</label>
+                                <input type="color" id="profileColor" name="profileColor" value="{{user.profile_color}}">
+                            </div>
+                            <div class="form-group">
+                                <label for="profileIcon">Profile Icon:</label>
+                                <select id="profileIcon" name="profileIcon">
+                                    <option value="🤠" {{#if (eq user.profile_icon '🤠')}}selected{{/if}}>🤠 Cowboy</option>
+                                    <option value="👨‍🌾" {{#if (eq user.profile_icon '👨‍🌾')}}selected{{/if}}>👨‍🌾 Farmer</option>
+                                    <option value="👩‍🌾" {{#if (eq user.profile_icon '👩‍🌾')}}selected{{/if}}>👩‍🌾 Farmer</option>
+                                    <option value="🐎" {{#if (eq user.profile_icon '🐎')}}selected{{/if}}>🐎 Horse</option>
+                                    <option value="🐄" {{#if (eq user.profile_icon '🐄')}}selected{{/if}}>🐄 Cow</option>
+                                    <option value="🌵" {{#if (eq user.profile_icon '🌵')}}selected{{/if}}>🌵 Cactus</option>
+                                    <option value="⭐" {{#if (eq user.profile_icon '⭐')}}selected{{/if}}>⭐ Star</option>
+                                    <option value="🌙" {{#if (eq user.profile_icon '🌙')}}selected{{/if}}>🌙 Moon</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="bio">Bio:</label>
+                                <textarea id="bio" name="bio" rows="4">{{user.bio}}</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Profile</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Recent Comments -->
+                    <div class="profile-section">
+                        <h3>My Recent Comments</h3>
+                        {{#if comments.length}}
+                            <div class="comments-list">
+                                {{#each comments}}
+                                    <div class="profile-comment">
+                                        <div class="comment-text">{{truncate this.text 100}}</div>
+                                        <div class="comment-meta">
+                                            <span>{{formatDate this.created_at}}</span>
+                                            <a href="/comments#comment-{{this.id}}">View</a>
+                                        </div>
+                                    </div>
+                                {{/each}}
+                            </div>
+                        {{else}}
+                            <p>No comments yet.</p>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+        </main>
+        {{> footer }}
+    </div>
+</body>
+</html>

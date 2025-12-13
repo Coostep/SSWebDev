@@ -8,18 +8,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Wild West Forum</title>
-    <link rel="stylesheet" href="../../css/styles.css">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
     <div class="container">
         {{> nav }}
         <main>
             <div class="auth-page">
-                <h2>Login to the Wild West Forum</h2>
+                <h2>Login</h2>
+                
                 {{#if error}}
                     <div class="error-message">{{error}}</div>
                 {{/if}}
+                
+                {{#if success}}
+                    <div class="success-message">{{success}}</div>
+                {{/if}}
+                
                 <form action="/login" method="POST" class="auth-form">
                     <div class="form-group">
                         <label for="username">Username:</label>
@@ -31,7 +37,11 @@
                     </div>
                     <button type="submit" class="btn btn-primary">Login</button>
                 </form>
-                <p>Don't have an account? <a href="/register">Register here</a></p>
+                
+                <div class="auth-links">
+                    <p>Don't have an account? <a href="/register">Register here</a></p>
+                    <p><a href="/password/forgot">Forgot your password?</a></p>
+                </div>
             </div>
         </main>
         {{> footer }}

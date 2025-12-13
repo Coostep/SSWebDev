@@ -1,0 +1,92 @@
+<!--
+    This comment.hbs partial is used to display individual comments in the Wild West Forum application.
+-->
+
+<div class="comment-card" data-comment-id="{{comment.id}}">
+    <div class="comment-header">
+        <div class="comment-author">
+            <span class="profile-icon">{{comment.profile_icon}}</span>
+            <strong style="color: {{comment.profile_color}};">{{comment.display_name}}</strong>
+            <small>@{{comment.username}}</small>
+        </div>
+        <div class="comment-meta">
+            <span class="comment-date">{{formatDate comment.created_at}}</span>
+            {{#if comment.edited_at}}
+                <small class="edited">(edited {{formatDate comment.edited_at}})</small>
+            {{/if}}
+        </div>
+    </div>
+    
+    <div class="comment-body">
+        <div class="comment-text">{{{comment.text_html}}}</div>
+        
+        <div class="comment-actions">
+            <div class="vote-section">
+                <button class="vote-btn vote-up {{#if (eq comment.userVote 1)}}active{{/if}}" 
+                        data-comment-id="{{comment.id}}" data-vote="up">
+                    ↑
+                </button>
+                <span class="vote-count" data-comment-id="{{comment.id}}">{{comment.votes}}</span>
+                <button class="vote-btn vote-down {{#if (eq comment.userVote -1)}}active{{/if}}" 
+                        data-comment-id="{{comment.id}}" data-vote="down">
+                    ↓
+                </button>
+            </div>
+            
+            {{#if ../currentUser}}
+                <button class="reply-btn" onclick="showReplyForm('{{comment.id}}')">Reply</button>
+                
+                {{#if (eq comment.user_id ../currentUser.id)}}
+                    <a href="/comments/{{comment.id}}/edit" class="btn-edit">Edit</a>
+                    <button class="btn-delete" onclick="deleteComment('{{comment.id}}')">Delete</button>
+                {{/if}}
+            {{/if}}
+        </div>
+        
+        <div id="reply-form-{{comment.id}}" class="reply-form" style="display: none;">
+            <form action="/comments" method="POST">
+                <input type="hidden" name="parentId" value="{{comment.id}}">
+                <textarea name="text" rows="3" placeholder="Write a reply..." required></textarea>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Post Reply</button>
+                    <button type="button" class="btn btn-secondary" onclick="hideReplyForm('{{comment.id}}')">Cancel</button>
+                </div>
+            </form>
+        </div>
+        
+        {{#if comment.replies}}
+            <div class="replies">
+                {{#each comment.replies}}
+                    {{> comment comment=this currentUser=../../currentUser level=1}}
+                {{/each}}
+            </div>
+        {{/if}}
+    </div>
+</div>
+
+<script>
+function showReplyForm(commentId) {
+    document.getElementById(`reply-form-${commentId}`).style.display = 'block';
+}
+
+function hideReplyForm(commentId) {
+    document.getElementById(`reply-form-${commentId}`).style.display = 'none';
+}
+
+async function deleteComment(commentId) {
+    if (confirm('Are you sure you want to delete this comment?')) {
+        try {
+            const response = await fetch(`/comments/${commentId}/delete`, {
+                method: 'POST'
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                location.reload();
+            }
+        } catch (error) {
+            console.error('Error deleting comment:', error);
+        }
+    }
+}
+</script>

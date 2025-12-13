@@ -6,13 +6,17 @@
 <nav class="navbar">
     <div class="nav-brand">
         <h1>🤠 Wild West Forum</h1>
+        <small>Secure Edition</small>
     </div>
     <div class="nav-links">
         <a href="/">Home</a>
         <a href="/comments">Comments</a>
+        <a href="/chat">Live Chat</a>
         {{#if currentUser}}
-            <span class="user-info">Howdy, {{currentUser}}!</span>
-            <a href="/comment/new">New Comment</a>
+            <span class="user-info" style="color: {{currentUser.color}};">
+                {{currentUser.icon}} {{currentUser.displayName}}
+            </span>
+            <a href="/profile">Profile</a>
             <form action="/logout" method="POST" class="logout-form">
                 <button type="submit">Logout</button>
             </form>

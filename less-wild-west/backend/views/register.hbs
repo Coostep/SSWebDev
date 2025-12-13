@@ -2,37 +2,64 @@
     register.hbs
     The registration page for the Less Wild West forum application.
 -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Wild West Forum</title>
-    <link rel="stylesheet" href="../../css/styles.css">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
     <div class="container">
         {{> nav }}
         <main>
             <div class="auth-page">
-                <h2>Register for the Wild West Forum</h2>
+                <h2>Register</h2>
+                
                 {{#if error}}
                     <div class="error-message">{{error}}</div>
                 {{/if}}
+                
                 <form action="/register" method="POST" class="auth-form">
                     <div class="form-group">
                         <label for="username">Username:</label>
                         <input type="text" id="username" name="username" required>
+                        <small>Must be unique</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="displayName">Display Name:</label>
+                        <input type="text" id="displayName" name="displayName" required>
+                        <small>Shown publicly, must be different from username</small>
                     </div>
                     <div class="form-group">
                         <label for="password">Password:</label>
                         <input type="password" id="password" name="password" required>
-                        <small class="warning-text">Warning: Passwords stored in plaintext!</small>
+                        <div class="password-requirements">
+                            <small>Must contain:</small>
+                            <ul>
+                                <li>At least 8 characters</li>
+                                <li>One uppercase letter</li>
+                                <li>One lowercase letter</li>
+                                <li>One number</li>
+                                <li>One special character</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password:</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Register</button>
                 </form>
-                <p>Already have an account? <a href="/login">Login here</a></p>
+                
+                <div class="auth-links">
+                    <p>Already have an account? <a href="/login">Login here</a></p>
+                </div>
             </div>
         </main>
         {{> footer }}
