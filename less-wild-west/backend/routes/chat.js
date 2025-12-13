@@ -1,0 +1,82 @@
+/*
+    This chat.js file defines the routes for handling chat operations in the backend server.
+*/
+
+const express = require('express');
+const router = express.Router();
+const db = require('../database');
+const { requireAuth } = require('../middleware/auth');
+
+router.get('/', requireAuth, (req, res) => {
+    try {
+        const messages = db.prepare(`
+            SELECT cm.*, 
+                   u.username, u.display_name, u.profile_color, u.profile_icon
+            FROM chat_messages cm
+            JOIN users u ON cm.user_id = u.id
+            ORDER BY cm.created_at DESC
+            LIMIT 50
+        `).all();
+
+        messages.reverse();
+        
+        res.render('chat', {
+            title: 'Live Chat - Wild West Forum',
+            messages: messages,
+            currentUser: req.session.user
+        });
+    } catch (error) {
+        console.error('Error loading chat:', error);
+        res.status(500).render('error', {
+            title: 'Error - Wild West Forum',
+            message: 'Failed to load chat'
+        });
+    }
+});
+
+router.get('/history', requireAuth, (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 50;
+        const before = req.query.before; 
+        
+        let query = `
+            SELECT cm.*, 
+                   u.username, u.display_name, u.profile_color, u.profile_icon
+            FROM chat_messages cm
+            JOIN users u ON cm.user_id = u.id
+        `;
+        
+        const params = [];
+        
+        if (before) {
+            query += ` WHERE cm.created_at < ?`;
+            params.push(before);
+        }
+        
+        query += ` ORDER BY cm.created_at DESC LIMIT ?`;
+        params.push(limit);
+        
+        const stmt = db.prepare(query);
+        const messages = stmt.all(...params);
+        
+        res.json({
+            success: true,
+            messages: messages.reverse()
+        });
+    } catch (error) {
+        console.error('Error fetching chat history:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to fetch chat history' 
+        });
+    }
+});
+
+router.get('/online', requireAuth, (req, res) => {
+    res.json({
+        success: true,
+        onlineUsers: []
+    });
+});
+
+module.exports = router;

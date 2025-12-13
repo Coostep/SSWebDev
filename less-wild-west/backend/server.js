@@ -3,206 +3,186 @@
     This file sets up the Express server, configures middleware,
     handles routing, and manages user sessions.
 */
-
-// Importing modules
-
 const express = require('express');
-const hbs = require('hbs');
-const cookieParser = require('cookie-parser');
+const http = require('http');
+const session = require('express-session');
+const { Server } = require('socket.io');
 const path = require('path');
+const cookieParser = require('cookie-parser');
+const hbs = require('hbs');
 
-//  Initializng express and hard setting port
+// Custom modules
+const db = require('./database');
+const SQLiteStore = require('./sqlite-session-store');
+const authMiddleware = require('./middleware/auth');
+
+// Import routes
+const authRoutes = require('./routes/auth');
+const commentRoutes = require('./routes/comments');
+const profileRoutes = require('./routes/profile');
+const passwordRoutes = require('./routes/password-recovery');
+const chatRoutes = require('./routes/chat');
+
 const app = express();
-const PORT = 3000;
+const server = http.createServer(app);
+const io = new Server(server);
 
-// Temp in-memory storage 
-const users = [];
-const comments = [];
-const sessions = {};
-
-// Configure view templating settings and hbs
+// Configure view engine
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 hbs.registerPartials(path.join(__dirname, 'views', 'partials'));
 
-// Set up middleware
-app.use(express.static('public'));
-app.use(express.urlencoded({ extended: false }));
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Setting up session IDs
-app.use((req, res, next) => {
-    let sessionId = req.cookies.sessionId;
-
-    // Create a new session if one doesnt exist
-    if (!sessionId || !sessions[sessionId]) {
-        sessionId = Math.random().toString(36).substring(6,7);
-	sessions[sessionId] = {
-            user: null,
-            visitCount: 0,
-            createdAt: new Date()
-        };
-
-	// Set session cookie for 24 hours
-        res.cookie('sessionId', sessionId, {
-            maxAge: 24 * 60 * 60 * 1000
-        });
+// Session configuration
+const sessionStore = new SQLiteStore();
+const sessionMiddleware = session({
+    store: sessionStore,
+    secret: process.env.SESSION_SECRET || 'change-this-in-production',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        sameSite: 'strict'
     }
-
-    // Attatch session to req 
-    req.session = sessions[sessionId];
-    req.sessionId = sessionId;
-
-
-    req.session.visitCount = (req.session.visitCount || 0) + 1;
-
-
-    next();
 });
 
-// Regist hbs helper for json formatting
-hbs.registerHelper('stringify', function(context) {
-    return JSON.stringify(context, null, 2);
-});
+app.use(sessionMiddleware);
 
-// make all user data available
+// Share session with Socket.IO
+io.engine.use(sessionMiddleware);
+
+// Global view variables
 app.use((req, res, next) => {
     res.locals.currentUser = req.session.user || null;
-    res.locals.sessionId = req.sessionId;
+    res.locals.sessionId = req.sessionID;
     next();
 });
 
-// handling routes
+// Routes
+app.use('/', authRoutes);
+app.use('/comments', commentRoutes);
+app.use('/profile', profileRoutes);
+app.use('/password', passwordRoutes);
+app.use('/chat', chatRoutes);
+
+// Home route
 app.get('/', (req, res) => {
     res.render('home', {
-        title: 'Wild West Forum - Home'
+        title: 'Wild West Forum - Secure Edition',
+        features: [
+            'Password hashing',
+            'SQLite3 database persistence',
+            'Account lockout protection',
+            'Email-based password recovery',
+            'Real-time chat',
+            'Enhanced comment system'
+        ]
     });
 });
 
-// registation routes
-app.get('/register', (req, res) => {
-    res.render('register', {
-        title: 'Register',
-        error: null
-    });
-});
-
-
-app.post('/register', (req, res) => {
-    const { username, password } = req.body;
-
-    // check if username already exists
-    if (users.find(u => u.username === username)) {
-        return res.render('register', {
-            title: 'Register',
-            error: 'Username already taken'
-        });
+// Socket.IO connection handler
+io.on('connection', (socket) => {
+    const session = socket.request.session;
+    
+    // Only allow authenticated users to use chat
+    if (!session || !session.user) {
+        socket.disconnect();
+        return;
     }
-
-    // Creates new user
-    users.push({ username, password });
-    console.log(`New user registered: ${username}, Password: ${password}`);
-
-
-    res.redirect('/login');
-});
-
-// login route
-app.get('/login', (req, res) => {
-    res.render('login', {
-        title: 'Login',
-        error: null
+    
+    console.log(`User ${session.user.username} connected to chat`);
+    
+    // Join user to their personal room
+    socket.join(`user_${session.user.id}`);
+    
+    // Handle chat messages
+    socket.on('chatMessage', async (data) => {
+        try {
+            const { message } = data;
+            
+            if (!message || message.trim().length === 0) {
+                return;
+            }
+            
+            // Store message in database
+            const stmt = db.prepare(`
+                INSERT INTO chat_messages (user_id, message) 
+                VALUES (?, ?)
+            `);
+            const result = stmt.run(session.user.id, message.trim());
+            
+            // Get user info for the message
+            const userStmt = db.prepare(`
+                SELECT username, display_name, profile_color, profile_icon
+                FROM users WHERE id = ?
+            `);
+            const user = userStmt.get(session.user.id);
+            
+            // Broadcast message to all connected users
+            io.emit('chatMessage', {
+                id: result.lastInsertRowid,
+                user: {
+                    id: session.user.id,
+                    username: user.username,
+                    displayName: user.display_name,
+                    color: user.profile_color,
+                    icon: user.profile_icon
+                },
+                message: message.trim(),
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error('Error handling chat message:', error);
+            socket.emit('error', { message: 'Failed to send message' });
+        }
+    });
+    
+    // Handle disconnection
+    socket.on('disconnect', () => {
+        console.log(`User ${session.user?.username || 'unknown'} disconnected from chat`);
     });
 });
 
-
-app.post('/login', (req, res) => {
-    const { username, password } = req.body;
-
-    // find mathing user
-    const user = users.find(u => u.username === username && u.password === password);
-
-
-    if (!user) {
-        return res.render('login', {
-            title: 'Login',
-            error: 'Invalid username or password'
-        });
-    }
-
-    // create session
-    req.session.user = username;
-    req.session.loginTime = new Date();
-
-
-    console.log(`User ${username} logged in at ${req.session.loginTime}`);
-
-
-    res.redirect('/');
-});
-
-// logout route
-app.post('/logout', (req, res) => {
-    const username = req.session.user;
-
-    // clear session data
-    req.session.user = null;
-    delete req.session.loginTime;
-
-    // clear client cookies and server session
-    res.clearCookie('sessionId');
-    delete sessions[req.sessionId];
-
-
-    console.log(`User ${username} logged out`);
-    res.redirect('/');
-});
-
-// comments route
-app.get('/comments', (req, res) => {
-    res.render('comments', {
-        title: 'All Comments',
-        comments: comments.sort((a, b) => b.createdAt - a.createdAt)
+// 404 handler
+app.use((req, res) => {
+    res.status(404).render('404', {
+        title: '404 - Page Not Found',
+        message: 'The page you\'re looking for doesn\'t exist.'
     });
 });
 
-// new comment route
-app.get('/comment/new', (req, res) => {
-    if (!req.session.user) {
-        return res.redirect('/login');
-    }
-
-
-    res.render('new-comment', {
-        title: 'New Comment'
+// Error handler
+app.use((err, req, res, next) => {
+    console.error('Server error:', err);
+    res.status(500).render('error', {
+        title: '500 - Server Error',
+        message: 'Something went wrong on our end. Please try again later.'
     });
 });
 
-// comment creation route
-app.post('/comment', (req, res) => {
-    if (!req.session.user) {
-        return res.redirect('/login');
-    }
-
-
-    const { text } = req.body;
-
-    // add comments to storage
-    comments.push({
-        author: req.session.user,
-        text: text,
-        createdAt: new Date()
+// Graceful shutdown
+process.on('SIGINT', () => {
+    console.log('\nShutting down gracefully...');
+    sessionStore.close();
+    db.close();
+    server.close(() => {
+        console.log('Server closed');
+        process.exit(0);
     });
-
-
-    console.log(`New comment posted by ${req.session.user}`);
-
-
-    res.redirect('/comments');
 });
-// makes sure server is working on right port
-app.listen(PORT, () => {
-    console.log(`Wild West Forum running on port ${PORT}`);
+
+// Start server
+const PORT = 3000;
+server.listen(PORT, () => {
+    console.log(`Secure Wild West Forum running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 
 

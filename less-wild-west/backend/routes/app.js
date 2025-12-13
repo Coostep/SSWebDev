@@ -1,3 +1,0 @@
-/*
-    This app.js file sets up the main application routes for the backend server.
-*/
