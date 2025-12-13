@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        {{> nav }}
+        <main>
+            <div class="new-comment-page">
+                <h2>Edit Comment</h2>
+                
+                {{#if error}}
+                    <div class="error-message">{{error}}</div>
+                {{/if}}
+                
+                <form action="/comments/{{comment.id}}/edit" method="POST" class="comment-form">
+                    <div class="form-group">
+                        <label for="text">Your Comment:</label>
+                        <textarea id="text" name="text" rows="6" required>{{comment.text}}</textarea>
+                        <small>Supports <a href="https://www.markdownguide.org/basic-syntax/" target="_blank">markdown</a></small>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Update Comment</button>
+                        <a href="/comments" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+        {{> footer }}
+    </div>
+</body>
+</html>
