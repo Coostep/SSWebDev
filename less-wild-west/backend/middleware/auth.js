@@ -4,11 +4,10 @@
     It includes functions for validating API keys and enforcing HTTPS connections.
 */
 
-const db = require('../database');
 const loginTracker = require('../modules/login-tracker');
 
 function requireAuth(req, res, next) {
-    if (req.session && req.session.userId) {
+    if (req.session && req.session.user) {
         next();
     } else {
         res.status(401).json({ 
@@ -32,22 +31,11 @@ function checkLoginLockout(req, res, next) {
         const minutesRemaining = Math.ceil(lockoutStatus.remainingTime / (60 * 1000));
         return res.status(429).json({
             error: 'Account locked',
-            message: `Too many failed attempts. Please try again in ${minutesRemaining} minute(s).`,
-            remainingTime: lockoutStatus.remainingTime
+            message: `Too many failed attempts. Try again in ${minutesRemaining} minute(s).`
         });
     }
     
     next();
-}
-
-function requireAdmin(req, res, next) {
-    if (req.session && req.session.role === 'admin') {
-        next();
-    } else {
-        res.status(403).json({ 
-            error: 'Admin access required'
-        });
-    }
 }
 
 function getClientIP(req) {
@@ -60,6 +48,5 @@ function getClientIP(req) {
 module.exports = {
     requireAuth,
     checkLoginLockout,
-    requireAdmin,
     getClientIP
 };

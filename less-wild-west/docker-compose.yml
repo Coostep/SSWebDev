@@ -1,14 +1,29 @@
+version: '3.8'
+
 services:
   # Node.js Express application
   backend-nodejs:
     build: ./backend
-    container_name: backend-nodejs
+    container_name: wild-west-forum-backend
     restart: unless-stopped
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - SESSION_SECRET=${SESSION_SECRET}
+      - GMAIL_USER=${GMAIL_USER}
+      - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
+      - DB_PATH=/app/data/forum.db
+    volumes:
+      - ./backend/data:/app/data
+      - ./backend/logs:/app/logs
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # Nginx Proxy Manager
   nginx-proxy-manager:
@@ -18,13 +33,45 @@ services:
     ports:
       - '80:80'      # HTTP traffic
       - '443:443'    # HTTPS traffic
-      - '5001:81'    # Admin web interface, pick an unusual port for security
-    volumes: # place to store all the data that we need persistant and external
+      - '5001:81'    # Admin web interface
+    volumes:
       - ./nginx/data:/data
       - ./nginx/letsencrypt:/etc/letsencrypt
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend-nodejs
     networks:
       - app-network
+
+  # Database backup service (optional)
+  backup:
+    image: alpine
+    container_name: db-backup
+    restart: unless-stopped
+    volumes:
+      - ./backend/data:/data
+      - ./backups:/backups
+    networks:
+      - app-network
+    command: >
+      sh -c "
+        while true; do
+          if [ -f /data/forum.db ]; then
+            cp /data/forum.db /backups/forum_backup_$$(date +%Y%m%d_%H%M%S).db
+            echo 'Database backup created'
+            # Keep only last 7 days of backups
+            find /backups -name 'forum_backup_*.db' -mtime +7 -delete
+          fi
+          sleep 86400
+        done
+      "
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  nginx-data:
+  nginx-letsencrypt:
+  app-data:
+  backup-data:

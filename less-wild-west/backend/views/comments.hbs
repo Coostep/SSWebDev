@@ -1,14 +1,9 @@
-<!--
-    comments.hbs
-    View template for posting a new comment in the Wild West Forum application.
--->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{title}}</title>
+    <title>Comments - Wild West Forum</title>
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
@@ -24,15 +19,35 @@
                     </div>
                 {{/if}}
                 
-                {{#if pagination}}
-                    <div class="pagination-info">
-                        <p>Page {{pagination.page}} of {{pagination.totalPages}} ({{pagination.total}} total comments)</p>
-                    </div>
-                {{/if}}
-                
                 <div class="comments-list">
                     {{#each comments}}
-                        {{> comment comment=this currentUser=../currentUser}}
+                        <div class="comment-card">
+                            <div class="comment-header">
+                                <div class="comment-author">
+                                    <span class="profile-icon">{{this.profile_icon}}</span>
+                                    <strong style="color: {{this.profile_color}};">{{this.display_name}}</strong>
+                                    <small>@{{this.username}}</small>
+                                </div>
+                                <div class="comment-meta">
+                                    <span class="comment-date">{{this.created_at}}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="comment-body">
+                                <div class="comment-text">{{{this.text_html}}}</div>
+                                
+                                {{#if ../currentUser}}
+                                    <div class="comment-actions">
+                                        <a href="/comments/new?parentId={{this.id}}" class="reply-btn">Reply</a>
+                                        
+                                        {{#if this.isOwner}}
+                                            <a href="/comments/{{this.id}}/edit" class="btn-edit">Edit</a>
+                                            <button class="btn-delete" onclick="deleteComment('{{this.id}}')">Delete</button>
+                                        {{/if}}
+                                    </div>
+                                {{/if}}
+                            </div>
+                        </div>
                     {{else}}
                         <div class="no-comments">
                             <p>No comments yet. Be the first to post!</p>
@@ -40,79 +55,42 @@
                     {{/each}}
                 </div>
                 
-                {{#if pagination}}
-                    <div class="pagination-controls">
+                <!-- Simple pagination without helpers -->
+                <div class="simple-pagination">
+                    {{#if pagination}}
                         {{#if pagination.hasPrev}}
-                            <a href="/comments?page={{pagination.prevPage}}&limit={{pagination.limit}}" class="btn btn-secondary">Previous</a>
+                            <a href="/comments?page={{pagination.prevPage}}" class="btn btn-secondary">← Previous</a>
                         {{/if}}
                         
-                        <div class="page-numbers">
-                            {{#range 1 pagination.totalPages}}
-                                {{#if (eq this ../pagination.page)}}
-                                    <span class="current-page">{{this}}</span>
-                                {{else}}
-                                    <a href="/comments?page={{this}}&limit={{../pagination.limit}}" class="page-link">{{this}}</a>
-                                {{/if}}
-                            {{/range}}
-                        </div>
+                        <span>Page {{pagination.page}} of {{pagination.totalPages}}</span>
                         
                         {{#if pagination.hasNext}}
-                            <a href="/comments?page={{pagination.nextPage}}&limit={{pagination.limit}}" class="btn btn-secondary">Next</a>
+                            <a href="/comments?page={{pagination.nextPage}}" class="btn btn-secondary">Next →</a>
                         {{/if}}
-                    </div>
-                {{/if}}
+                    {{/if}}
+                </div>
             </div>
         </main>
         {{> footer }}
     </div>
     
     <script>
-        // Handle comment voting
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.vote-btn').forEach(button => {
-                button.addEventListener('click', async function(e) {
-                    e.preventDefault();
-                    const commentId = this.dataset.commentId;
-                    const voteType = this.dataset.vote;
+        async function deleteComment(commentId) {
+            if (confirm('Are you sure you want to delete this comment?')) {
+                try {
+                    const response = await fetch(`/comments/${commentId}/delete`, {
+                        method: 'POST'
+                    });
                     
-                    try {
-                        const response = await fetch(`/comments/${commentId}/vote`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ vote: voteType })
-                        });
-                        
-                        const data = await response.json();
-                        if (data.success) {
-                            // Update vote count
-                            const voteCount = document.querySelector(`.vote-count[data-comment-id="${commentId}"]`);
-                            if (voteCount) {
-                                voteCount.textContent = data.votes;
-                            }
-                            
-                            // Update button states
-                            const upBtn = document.querySelector(`.vote-up[data-comment-id="${commentId}"]`);
-                            const downBtn = document.querySelector(`.vote-down[data-comment-id="${commentId}"]`);
-                            
-                            if (data.userVote === 1) {
-                                upBtn.classList.add('active');
-                                downBtn.classList.remove('active');
-                            } else if (data.userVote === -1) {
-                                downBtn.classList.add('active');
-                                upBtn.classList.remove('active');
-                            } else {
-                                upBtn.classList.remove('active');
-                                downBtn.classList.remove('active');
-                            }
-                        }
-                    } catch (error) {
-                        console.error('Error voting:', error);
+                    const data = await response.json();
+                    if (data.success) {
+                        location.reload();
                     }
-                });
-            });
-        });
+                } catch (error) {
+                    console.error('Error deleting comment:', error);
+                }
+            }
+        }
     </script>
 </body>
 </html>

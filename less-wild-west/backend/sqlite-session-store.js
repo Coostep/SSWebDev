@@ -1,7 +1,3 @@
-/*
-    This sqlite-session-store.js file is used to create a session store using SQLite for the Less Wild West application.
-*/
-
 const { Store } = require('express-session');
 const db = require('./database');
 
@@ -10,13 +6,9 @@ class SQLiteStore extends Store {
         super(options);
         this.table = 'sessions';
         
-        this.cleanupInterval = setInterval(() => {
+        setInterval(() => {
             this.cleanup();
         }, 15 * 60 * 1000);
-        
-        process.on('SIGINT', () => {
-            clearInterval(this.cleanupInterval);
-        });
     }
     
     get(sid, callback) {
@@ -26,8 +18,7 @@ class SQLiteStore extends Store {
             ).get(sid, Date.now());
             
             if (row) {
-                const session = JSON.parse(row.sess);
-                callback(null, session);
+                callback(null, JSON.parse(row.sess));
             } else {
                 callback(null, null);
             }
@@ -38,8 +29,7 @@ class SQLiteStore extends Store {
     
     set(sid, sess, callback) {
         try {
-            const maxAge = sess.cookie?.maxAge;
-            const expire = maxAge ? Date.now() + maxAge : Date.now() + (24 * 60 * 60 * 1000); // 24 hours default
+            const expire = Date.now() + (24 * 60 * 60 * 1000); // 24 hours
             const sessData = JSON.stringify(sess);
             
             db.prepare(
@@ -76,9 +66,7 @@ class SQLiteStore extends Store {
     }
     
     close() {
-        if (this.cleanupInterval) {
-            clearInterval(this.cleanupInterval);
-        }
+
     }
 }
 
