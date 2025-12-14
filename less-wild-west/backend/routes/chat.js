@@ -5,25 +5,27 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database');
-const { requireAuth } = require('../middleware/auth');
 
-router.get('/', requireAuth, (req, res) => {
+router.get('/', (req, res) => {
     try {
-        const messages = db.prepare(`
-            SELECT cm.*, 
-                   u.username, u.display_name, u.profile_color, u.profile_icon
-            FROM chat_messages cm
-            JOIN users u ON cm.user_id = u.id
-            ORDER BY cm.created_at DESC
-            LIMIT 50
-        `).all();
-
-        messages.reverse();
+        let messages = [];
+        if (req.session.user) {
+            messages = db.prepare(`
+                SELECT cm.*, 
+                       u.username, u.display_name, u.profile_color, u.profile_icon
+                FROM chat_messages cm
+                JOIN users u ON cm.user_id = u.id
+                ORDER BY cm.created_at DESC
+                LIMIT 50
+            `).all();
+            
+            messages.reverse();
+        }
         
         res.render('chat', {
             title: 'Live Chat - Wild West Forum',
             messages: messages,
-            currentUser: req.session.user
+            currentUser: req.session.user || null
         });
     } catch (error) {
         console.error('Error loading chat:', error);
@@ -34,10 +36,17 @@ router.get('/', requireAuth, (req, res) => {
     }
 });
 
-router.get('/history', requireAuth, (req, res) => {
+router.get('/history', (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ 
+            success: false, 
+            error: 'Authentication required' 
+        });
+    }
+    
     try {
         const limit = parseInt(req.query.limit) || 50;
-        const before = req.query.before; 
+        const before = req.query.before;
         
         let query = `
             SELECT cm.*, 
@@ -72,7 +81,14 @@ router.get('/history', requireAuth, (req, res) => {
     }
 });
 
-router.get('/online', requireAuth, (req, res) => {
+router.get('/online', (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ 
+            success: false, 
+            error: 'Authentication required' 
+        });
+    }
+    
     res.json({
         success: true,
         onlineUsers: []

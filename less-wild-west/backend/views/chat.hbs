@@ -1,8 +1,3 @@
-<!--
-    This chat.hbs file is used to render the chat interface in the Less Wild West application.
-    It includes the necessary HTML structure and Handlebars syntax to display chat messages.
--->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,21 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
     <link rel="stylesheet" href="/css/styles.css">
+    {{#if currentUser}}
     <script src="/socket.io/socket.io.js"></script>
+    {{/if}}
 </head>
 <body>
     <div class="container">
-        {{ nav }}
+        {{> nav }}
         <main>
             <div class="chat-page">
                 <h2>Live Chat</h2>
+                
+                {{#if currentUser}}
+                <!-- Logged-in user sees the chat interface -->
                 <p class="subtitle">Real-time chat with all users</p>
                 
                 <div class="chat-container">
                     <div class="chat-sidebar">
                         <h3>Online Users</h3>
                         <div id="online-users" class="online-users">
-                            <!-- Online users will be populated by JavaScript -->
+                            <p>Loading online users...</p>
                         </div>
                     </div>
                     
@@ -51,13 +51,49 @@
                         </div>
                     </div>
                 </div>
+                
+                {{else}}
+                <!-- Not logged-in user sees a friendly message -->
+                <div class="chat-login-required">
+                    <div class="chat-login-card">
+                        <div class="chat-login-icon">💬</div>
+                        <h3>Join the Conversation!</h3>
+                        <p>To participate in the live chat, please log in or create an account.</p>
+                        
+                        <div class="chat-login-features">
+                            <div class="feature">
+                                <span class="feature-icon">👥</span>
+                                <span>Chat with other users in real-time</span>
+                            </div>
+                            <div class="feature">
+                                <span class="feature-icon">💭</span>
+                                <span>Share your thoughts instantly</span>
+                            </div>
+                            <div class="feature">
+                                <span class="feature-icon">🎨</span>
+                                <span>Use your customized profile</span>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-login-actions">
+                            <a href="/login" class="btn btn-primary">Login to Chat</a>
+                            <a href="/register" class="btn btn-secondary">Create Account</a>
+                        </div>
+                        
+                        <p class="chat-login-note">
+                            Already have an account? <a href="/login">Login here</a>
+                        </p>
+                    </div>
+                </div>
+                {{/if}}
             </div>
         </main>
-        {{ footer }}
+        {{> footer }}
     </div>
     
+    {{#if currentUser}}
     <script>
-        // Connect to Socket.IO
+        // Only load chat JS if user is logged in
         const socket = io();
         
         // Get DOM elements
@@ -116,20 +152,7 @@
         
         // Focus input on load
         messageInput.focus();
-        
-        // Load more messages when scrolling to top
-        let loading = false;
-        chatMessages.addEventListener('scroll', () => {
-            if (chatMessages.scrollTop === 0 && !loading) {
-                loading = true;
-                // Load older messages
-                const firstMessage = chatMessages.querySelector('.chat-message');
-                if (firstMessage) {
-                    // Implement pagination if needed
-                }
-                loading = false;
-            }
-        });
     </script>
+    {{/if}}
 </body>
 </html>
