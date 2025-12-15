@@ -1,44 +1,27 @@
 services:
   # Node.js Express application
-  backend:
+  backend-nodejs:
     build: ./backend
-    container_name: wild-west-forum-backend
+    container_name: backend-nodejs
     restart: unless-stopped
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - DATABASE_PATH=/data/forum.db
-      - SESSION_SECRET=${SESSION_SECRET:1234567890abcdef}
-      - GMAIL_USER=${GMAIL_USER:-cstepnq11@gmail.com}
-      - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD:-1234abcd!A}
-      - BASE_URL=${BASE_URL:-http://stepankiw.com}
-    volumes:
-      - ./data:/data
-      - ./backend/logs:/app/logs
-    ports:
-      - "3000:3000"
     networks:
       - app-network
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   # Nginx Proxy Manager
-  proxy:
+  nginx-proxy-manager:
     image: 'jc21/nginx-proxy-manager:latest'
-    container_name: wild-west-forum-proxy
+    container_name: nginx-proxy-manager
     restart: unless-stopped
     ports:
       - '80:80'      # HTTP traffic
       - '443:443'    # HTTPS traffic
-      - '5001:81'    # Admin web interface
-    volumes:
+      - '5001:81'    # Admin web interface, pick an unusual port for security
+    volumes: # place to store all the data that we need persistant and external
       - ./nginx/data:/data
       - ./nginx/letsencrypt:/etc/letsencrypt
-    depends_on:
-      - backend
     networks:
       - app-network
 
