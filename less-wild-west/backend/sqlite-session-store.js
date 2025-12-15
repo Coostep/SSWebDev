@@ -1,3 +1,4 @@
+// sqlite-session-store.js
 const { Store } = require('express-session');
 const db = require('./database');
 
