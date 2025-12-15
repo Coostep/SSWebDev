@@ -19,6 +19,17 @@ router.get('/', (req, res) => {
                 LIMIT 50
             `).all();
             
+
+            messages.forEach(msg => {
+                if (msg.created_at) {
+                    const date = new Date(msg.created_at);
+                    msg.formattedTime = date.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
+            });
+            
             messages.reverse();
         }
         

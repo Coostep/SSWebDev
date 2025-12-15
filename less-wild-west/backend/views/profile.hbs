@@ -1,8 +1,3 @@
-<!-- 
-    This profile.hbs file is a Handlebars template for rendering user profile pages in the Less Wild West application.
-    It displays user information such as username, email, and profile picture.
--->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,7 +31,7 @@
                                 <div>
                                     <h2 style="color: {{user.profile_color}};">{{user.display_name}}</h2>
                                     <p>@{{user.username}}</p>
-                                    <p><small>Member since {{formatDate user.created_at}}</small></p>
+                                    <p><small>Member since {{user.created_at}}</small></p>
                                 </div>
                             </div>
                             <div class="profile-bio">
@@ -113,14 +108,14 @@
                             <div class="form-group">
                                 <label for="profileIcon">Profile Icon:</label>
                                 <select id="profileIcon" name="profileIcon">
-                                    <option value="🤠" {{#if (eq user.profile_icon '🤠')}}selected{{/if}}>🤠 Cowboy</option>
-                                    <option value="👨‍🌾" {{#if (eq user.profile_icon '👨‍🌾')}}selected{{/if}}>👨‍🌾 Farmer</option>
-                                    <option value="👩‍🌾" {{#if (eq user.profile_icon '👩‍🌾')}}selected{{/if}}>👩‍🌾 Farmer</option>
-                                    <option value="🐎" {{#if (eq user.profile_icon '🐎')}}selected{{/if}}>🐎 Horse</option>
-                                    <option value="🐄" {{#if (eq user.profile_icon '🐄')}}selected{{/if}}>🐄 Cow</option>
-                                    <option value="🌵" {{#if (eq user.profile_icon '🌵')}}selected{{/if}}>🌵 Cactus</option>
-                                    <option value="⭐" {{#if (eq user.profile_icon '⭐')}}selected{{/if}}>⭐ Star</option>
-                                    <option value="🌙" {{#if (eq user.profile_icon '🌙')}}selected{{/if}}>🌙 Moon</option>
+                                    <option value="🤠">🤠 Cowboy</option>
+                                    <option value="👨‍🌾">👨‍🌾 Farmer</option>
+                                    <option value="👩‍🌾">👩‍🌾 Farmer</option>
+                                    <option value="🐎">🐎 Horse</option>
+                                    <option value="🐄">🐄 Cow</option>
+                                    <option value="🌵">🌵 Cactus</option>
+                                    <option value="⭐">⭐ Star</option>
+                                    <option value="🌙">🌙 Moon</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -138,10 +133,16 @@
                             <div class="comments-list">
                                 {{#each comments}}
                                     <div class="profile-comment">
-                                        <div class="comment-text">{{truncate this.text 100}}</div>
+                                        <div class="comment-text">
+                                            {{#if (gt this.text.length 100)}}
+                                                {{substring this.text 0 100}}...
+                                            {{else}}
+                                                {{this.text}}
+                                            {{/if}}
+                                        </div>
                                         <div class="comment-meta">
-                                            <span>{{formatDate this.created_at}}</span>
-                                            <a href="/comments#comment-{{this.id}}">View</a>
+                                            <span>{{this.created_at}}</span>
+                                            <a href="/comments">View</a>
                                         </div>
                                     </div>
                                 {{/each}}
@@ -155,5 +156,21 @@
         </main>
         {{> footer }}
     </div>
+    
+    <script>
+        // Preselect the current profile icon
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentIcon = '{{user.profile_icon}}';
+            const select = document.getElementById('profileIcon');
+            if (select && currentIcon) {
+                for (let i = 0; i < select.options.length; i++) {
+                    if (select.options[i].value === currentIcon) {
+                        select.options[i].selected = true;
+                        break;
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>

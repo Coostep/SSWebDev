@@ -18,11 +18,90 @@ const server = http.createServer(app);
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 
-try {
-    require('./views/helpers');
-} catch (error) {
-    console.log('Note: Handlebars helpers not found. Continuing without them.');
-}
+hbs.registerHelper('truncate', function(str, len) {
+    if (typeof str !== 'string') return '';
+    if (str.length <= len) return str;
+    return str.substring(0, len) + '...';
+});
+
+hbs.registerHelper('formatDate', function(dateString) {
+    if (!dateString) return '';
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch (e) {
+        return dateString;
+    }
+});
+hbs.registerHelper('formatTime', function(dateString) {
+    if (!dateString) return '';
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch (e) {
+        return dateString;
+    }
+});
+
+hbs.registerHelper('formatChatTime', function(dateString) {
+    if (!dateString) return '';
+    try {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffHours = diffMs / (1000 * 60 * 60);
+        
+        if (diffHours < 24) {
+            return date.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        else if (diffHours < 168) {
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            return days[date.getDay()] + ' ' + date.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        else {
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    } catch (e) {
+        return dateString;
+    }
+});
+
+hbs.registerHelper('eq', function(a, b, options) {
+    return a === b ? options.fn(this) : options.inverse(this);
+});
+
+hbs.registerHelper('if_eq', function(a, b, options) {
+    return a === b ? options.fn(this) : options.inverse(this);
+});
+
+hbs.registerHelper('gt', function(a, b) {
+    return a > b;
+});
+
+hbs.registerHelper('substring', function(str, start, end) {
+    if (typeof str !== 'string') return '';
+    return str.substring(start, end);
+});
 
 
 hbs.registerPartials(path.join(__dirname, 'views', 'partials'));

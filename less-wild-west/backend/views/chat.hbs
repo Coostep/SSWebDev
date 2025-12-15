@@ -3,11 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{title}}</title>
+    <title>{{title}} - Wild West Forum</title>
     <link rel="stylesheet" href="/css/styles.css">
-    {{#if currentUser}}
-    <script src="/socket.io/socket.io.js"></script>
-    {{/if}}
+    <style>
+        .chat-page {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .chat-page h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 2em;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .chat-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .messages-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #4a90e2;
+        }
+        
+        .message-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .profile-icon {
+            margin-right: 10px;
+            font-size: 1.3em;
+        }
+        
+        .message-header strong {
+            margin-right: 8px;
+            font-weight: 600;
+        }
+        
+        .message-header small {
+            color: #666;
+            margin-right: 10px;
+        }
+        
+        .message-time {
+            margin-left: auto;
+            color: #888;
+            font-size: 0.85em;
+        }
+        
+        .message-body {
+            color: #333;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        
+        .message-input-section {
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .message-input-form {
+            display: flex;
+            gap: 10px;
+        }
+        
+        #messageInput {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        
+        #messageInput:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+        
+        .message-input-form button {
+            padding: 10px 20px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .message-input-form button:hover {
+            background: #357abd;
+        }
+        
+        .no-messages {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        .auth-required {
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 1.1em;
+        }
+        
+        .auth-required a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .auth-required a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Scrollbar styling */
+        .messages-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .messages-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        .messages-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        
+        .messages-container::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 65vh;
+            }
+            
+            .message-header {
+                flex-wrap: wrap;
+            }
+            
+            .message-time {
+                margin-left: 0;
+                width: 100%;
+                margin-top: 5px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -17,74 +184,47 @@
                 <h2>Live Chat</h2>
                 
                 {{#if currentUser}}
-                <!-- Logged-in user sees the chat interface -->
-                <p class="subtitle">Real-time chat with all users</p>
-                
-                <div class="chat-container">
-                    <div class="chat-sidebar">
-                        <h3>Online Users</h3>
-                        <div id="online-users" class="online-users">
-                            <p>Loading online users...</p>
-                        </div>
-                    </div>
-                    
-                    <div class="chat-main">
-                        <div id="chat-messages" class="chat-messages">
+                    <div class="chat-container">
+                        <div class="messages-container" id="messagesContainer">
                             {{#each messages}}
-                                <div class="chat-message">
+                                <div class="message" data-message-id="{{this.id}}">
                                     <div class="message-header">
                                         <span class="profile-icon">{{this.profile_icon}}</span>
                                         <strong style="color: {{this.profile_color}};">{{this.display_name}}</strong>
                                         <small>@{{this.username}}</small>
-                                        <span class="message-time">{{formatTime this.created_at}}</span>
+                                        <span class="message-time">
+                                            {{#if this.created_at}}
+                                                {{formatTime this.created_at}}
+                                            {{/if}}
+                                        </span>
                                     </div>
-                                    <div class="message-content">{{this.message}}</div>
+                                    <div class="message-body">
+                                        {{this.message}}
+                                    </div>
+                                </div>
+                            {{else}}
+                                <div class="no-messages">
+                                    <p>No messages yet. Start the conversation!</p>
                                 </div>
                             {{/each}}
                         </div>
                         
-                        <div class="chat-input">
-                            <form id="chat-form">
-                                <input type="text" id="message-input" placeholder="Type your message..." autocomplete="off">
-                                <button type="submit" class="btn btn-primary">Send</button>
+                        <div class="message-input-section">
+                            <form class="message-input-form" id="chatForm">
+                                <input type="text" 
+                                       id="messageInput" 
+                                       placeholder="Type your message here..." 
+                                       maxlength="500"
+                                       required
+                                       autocomplete="off">
+                                <button type="submit" class="btn-send">Send</button>
                             </form>
                         </div>
                     </div>
-                </div>
-                
                 {{else}}
-                <!-- Not logged-in user sees a friendly message -->
-                <div class="chat-login-required">
-                    <div class="chat-login-card">
-                        <div class="chat-login-icon">💬</div>
-                        <h3>Join the Conversation!</h3>
-                        <p>To participate in the live chat, please log in or create an account.</p>
-                        
-                        <div class="chat-login-features">
-                            <div class="feature">
-                                <span class="feature-icon">👥</span>
-                                <span>Chat with other users in real-time</span>
-                            </div>
-                            <div class="feature">
-                                <span class="feature-icon">💭</span>
-                                <span>Share your thoughts instantly</span>
-                            </div>
-                            <div class="feature">
-                                <span class="feature-icon">🎨</span>
-                                <span>Use your customized profile</span>
-                            </div>
-                        </div>
-                        
-                        <div class="chat-login-actions">
-                            <a href="/login" class="btn btn-primary">Login to Chat</a>
-                            <a href="/register" class="btn btn-secondary">Create Account</a>
-                        </div>
-                        
-                        <p class="chat-login-note">
-                            Already have an account? <a href="/login">Login here</a>
-                        </p>
+                    <div class="auth-required">
+                        <p>Please <a href="/login">login</a> to participate in the chat.</p>
                     </div>
-                </div>
                 {{/if}}
             </div>
         </main>
@@ -92,67 +232,121 @@
     </div>
     
     {{#if currentUser}}
-    <script>
-        // Only load chat JS if user is logged in
-        const socket = io();
-        
-        // Get DOM elements
-        const chatMessages = document.getElementById('chat-messages');
-        const chatForm = document.getElementById('chat-form');
-        const messageInput = document.getElementById('message-input');
-        const onlineUsers = document.getElementById('online-users');
-        
-        // Handle incoming chat messages
-        socket.on('chatMessage', (data) => {
-            addMessage(data);
-            scrollToBottom();
-        });
-        
-        // Handle form submission
-        chatForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const message = messageInput.value.trim();
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            // Connect to Socket.IO
+            const socket = io();
             
-            if (message) {
-                socket.emit('chatMessage', { message });
-                messageInput.value = '';
+            // Get DOM elements
+            const messagesContainer = document.getElementById('messagesContainer');
+            const chatForm = document.getElementById('chatForm');
+            const messageInput = document.getElementById('messageInput');
+            
+            // Function to scroll to bottom
+            function scrollToBottom() {
+                if (messagesContainer) {
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
             }
-        });
-        
-        // Add message to chat
-        function addMessage(data) {
-            const messageElement = document.createElement('div');
-            messageElement.className = 'chat-message';
             
-            const time = new Date(data.timestamp).toLocaleTimeString([], { 
-                hour: '2-digit', 
-                minute: '2-digit' 
+            // Function to add a message to the UI
+            function addMessage(data, isNew = false) {
+                if (!messagesContainer) return;
+                
+                // Remove "no messages" placeholder if it exists
+                const noMessages = messagesContainer.querySelector('.no-messages');
+                if (noMessages) {
+                    noMessages.remove();
+                }
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message';
+                messageDiv.dataset.messageId = data.id;
+                
+                // Format time for new messages
+                let displayTime = 'Just now';
+                if (!isNew && data.timestamp) {
+                    try {
+                        const date = new Date(data.timestamp);
+                        displayTime = date.toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    } catch (e) {
+                        displayTime = data.timestamp;
+                    }
+                }
+                
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <span class="profile-icon">${data.user.icon || '👤'}</span>
+                        <strong style="color: ${data.user.color || '#000'};">${data.user.displayName || data.user.username}</strong>
+                        <small>@${data.user.username}</small>
+                        <span class="message-time">${displayTime}</span>
+                    </div>
+                    <div class="message-body">
+                        ${data.message}
+                    </div>
+                `;
+                
+                messagesContainer.appendChild(messageDiv);
+                scrollToBottom();
+            }
+            
+            // Handle form submission
+            if (chatForm) {
+                chatForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const message = messageInput.value.trim();
+                    if (!message) return;
+                    
+                    // Emit the message to the server
+                    socket.emit('chatMessage', { message: message });
+                    
+                    // Clear input
+                    messageInput.value = '';
+                    
+                    // Focus input
+                    messageInput.focus();
+                });
+            }
+            
+            // Handle incoming messages from server
+            socket.on('chatMessage', function(data) {
+                addMessage(data, true);
             });
             
-            messageElement.innerHTML = `
-                <div class="message-header">
-                    <span class="profile-icon">${data.user.icon}</span>
-                    <strong style="color: ${data.user.color};">${data.user.displayName}</strong>
-                    <small>@${data.user.username}</small>
-                    <span class="message-time">${time}</span>
-                </div>
-                <div class="message-content">${data.message}</div>
-            `;
+            // Handle connection errors
+            socket.on('connect_error', function(error) {
+                console.error('Socket connection error:', error);
+                alert('Connection to chat server failed. Please refresh the page.');
+            });
             
-            chatMessages.appendChild(messageElement);
-        }
-        
-        // Scroll to bottom of chat
-        function scrollToBottom() {
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-        
-        // Initial scroll to bottom
-        scrollToBottom();
-        
-        // Focus input on load
-        messageInput.focus();
-    </script>
+            // Handle socket errors
+            socket.on('error', function(data) {
+                console.error('Socket error:', data);
+                alert('Error: ' + (data.message || 'Unknown error'));
+            });
+            
+            // Handle Enter key to submit (Shift+Enter for new line)
+            if (messageInput) {
+                messageInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        chatForm.dispatchEvent(new Event('submit'));
+                    }
+                });
+            }
+            
+            // Initial setup
+            setTimeout(() => {
+                scrollToBottom();
+                if (messageInput) {
+                    messageInput.focus();
+                }
+            }, 100);
+        </script>
     {{/if}}
 </body>
 </html>
