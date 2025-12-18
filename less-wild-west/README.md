@@ -16,7 +16,7 @@ The Wild West Forum has evolved into a fully-featured web application with enhan
 
 **Comment System:** Nested comments with voting, editing, and deletion
 
-**User Profiles:**Customizable profiles with colors, icons, and bios
+**User Profiles:** Customizable profiles with colors, icons, and bios
 
 **Profile Management:** Edit display name, email, password, and customization options
 
@@ -61,85 +61,87 @@ The Wild West Forum has evolved into a fully-featured web application with enhan
 
 # Project Structure
 
-   less-wild-west/backend
-   ├── modules/                      # Utility modules and middleware
-   │   ├── auth.js                   # Authentication middleware
-   │   ├── login-tracker.js          # Login attempt tracking
-   │   ├── password-utils.js         # Password utilities
-   │   ├── email-service.js          # Email sending service
-   │   ├── markdown-parser.js        # Markdown parsing
-   │   ├── pdf-discovery.js          # PDF file management
-   │   ├── pdf-routing.js            # PDF routing utilities
-   │   └── pdf-validation.js         # PDF validation utilities
-   ├── routes/                       # Route handlers
-   │   ├── auth.js                   # Authentication routes
-   │   ├── comments.js               # Comment routes
-   │   ├── profile.js                # Profile management routes
-   │   ├── password-recovery.js      # Password reset routes
-   │   ├── chat.js                   # Chat routes
-   │   └── pdfs.js                   # PDF document routes
-   ├── views/                        # Handlebars templates
-   │   ├── partials/                 # Reusable template components
-   │   │   ├── comment.hbs           # Individual comment display
-   │   │   ├── footer.hbs            # Page footer
-   │   │   └── nav.hbs               # Navigation bar
-   │   ├── 404.hbs                   # 404 error page
-   │   ├── chat.hbs                  # Chat interface
-   │   ├── comments.hbs              # Comments list view
-   │   ├── edit-comment.hbs          # Comment editing form
-   │   ├── error.hbs                 # Error page
-   │   ├── forgot-password.hbs       # Forgot password form
-   │   ├── home.hbs                  # Home page
-   │   ├── login.hbs                 # Login form
-   │   ├── new-comment.hbs           # New comment form
-   │   ├── pdf-upload.hbs            # PDF upload form
-   │   ├── pdf-view.hbs              # PDF view page
-   │   ├── pdfs.hbs                  # PDF library
-   │   ├── profile.hbs               # User profile page
-   │   ├── register.hbs              # Registration form
-   │   └── reset-password.hbs        # Password reset form
-   ├── public/css/                   # Static assets
-   │   └── styles.css                # Main stylesheet
-   ├── pdfs/                         # PDF document storage
-   │   ├── Frontier Fonts.pdf        # AI Generated PDF - Frontier Fonts
-   │   ├── Sahara Storytime.pdf      # AI Generated PDF - Sahara Storytime
-   │   └── Wild Western Wordage.pdf  # AI Generated PDF - Wild Western Wordage
-   ├── node_modules/                 # npm dependencies (not tracked in git)
-   ├── database.js                   # Database configuration and setup
-   ├── server.js                     # Main server file
-   ├── sqlite-session-store.js       # Custom SQLite session store
-   ├── forum.db                      # SQLite database file
-   ├── forum.db-shm                  # SQLite shared memory file
-   ├── forum.db-wal                  # SQLite write-ahead log
-   ├── package.json                  # Project dependencies and scripts
-   ├── package-lock.json             # Locked dependency versions
-   ├── Dockerfile                    # Docker container configuration
-   docker-compose.yml                # Docker Compose configuration
-   .env.example                      # Example environment variables
-   README.md                         # Project documentation
-
+```less-wild-west/backend
+├── modules/                      # Utility modules and middleware
+│   ├── auth.js                   # Authentication middleware
+│   ├── login-tracker.js          # Login attempt tracking
+│   ├── password-utils.js         # Password utilities
+│   ├── email-service.js          # Email sending service
+│   ├── markdown-parser.js        # Markdown parsing
+│   ├── pdf-discovery.js          # PDF file management
+│   ├── pdf-routing.js            # PDF routing utilities
+│   └── pdf-validation.js         # PDF validation utilities
+├── routes/                       # Route handlers
+│   ├── auth.js                   # Authentication routes
+│   ├── comments.js               # Comment routes
+│   ├── profile.js                # Profile management routes
+│   ├── password-recovery.js      # Password reset routes
+│   ├── chat.js                   # Chat routes
+│   └── pdfs.js                   # PDF document routes
+├── views/                        # Handlebars templates
+│   ├── partials/                 # Reusable template components
+│   │   ├── comment.hbs           # Individual comment display
+│   │   ├── footer.hbs            # Page footer
+│   │   └── nav.hbs               # Navigation bar
+│   ├── 404.hbs                   # 404 error page
+│   ├── chat.hbs                  # Chat interface
+│   ├── comments.hbs              # Comments list view
+│   ├── edit-comment.hbs          # Comment editing form
+│   ├── error.hbs                 # Error page
+│   ├── forgot-password.hbs       # Forgot password form
+│   ├── home.hbs                  # Home page
+│   ├── login.hbs                 # Login form
+│   ├── new-comment.hbs           # New comment form
+│   ├── pdf-upload.hbs            # PDF upload form
+│   ├── pdf-view.hbs              # PDF view page
+│   ├── pdfs.hbs                  # PDF library
+│   ├── profile.hbs               # User profile page
+│   ├── register.hbs              # Registration form
+│   └── reset-password.hbs        # Password reset form
+├── public/css/                   # Static assets
+│   └── styles.css                # Main stylesheet
+├── pdfs/                         # PDF document storage
+│   ├── Frontier Fonts.pdf        # AI Generated PDF - Frontier Fonts
+│   ├── Sahara Storytime.pdf      # AI Generated PDF - Sahara Storytime
+│   └── Wild Western Wordage.pdf  # AI Generated PDF - Wild Western Wordage
+├── node_modules/                 # npm dependencies (not tracked in git)
+├── database.js                   # Database configuration and setup
+├── server.js                     # Main server file
+├── sqlite-session-store.js       # Custom SQLite session store
+├── forum.db                      # SQLite database file
+├── forum.db-shm                  # SQLite shared memory file
+├── forum.db-wal                  # SQLite write-ahead log
+├── package.json                  # Project dependencies and scripts
+├── package-lock.json             # Locked dependency versions
+├── Dockerfile                    # Docker container configuration
+docker-compose.yml                # Docker Compose configuration
+.env.example                      # Example environment variables
+README.md                         # Project documentation
+```
 # Run Instructions
 
 # Environment Setup
 **Clone the repository:**
 
-   bash
+   ```bash
    git clone <repository-url>
    cd wild-west-forum
+   ```
 
 **Install dependencies:**
-   bash
+   ```bash
    npm install
-   
+   ```
 # Running the Application
 
 **Start the server:**
-   bash
+   ```bash
    npm start
+   ```
 **Access the application:**
-
+   ```
    Open your browser and navigate to http://localhost:3000
-
+   ```
 # Database Schema Documentation
 **users**
    id INTEGER PRIMARY KEY AUTOINCREMENT
