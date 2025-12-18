@@ -115,6 +115,7 @@ const commentRoutes = require('./routes/comments');
 const profileRoutes = require('./routes/profile');
 const passwordRoutes = require('./routes/password-recovery');
 const chatRoutes = require('./routes/chat');
+const pdfRoutes = require('./routes/pdfs');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -185,6 +186,7 @@ app.use('/comments', commentRoutes);
 app.use('/profile', profileRoutes);
 app.use('/password', passwordRoutes);
 app.use('/chat', chatRoutes);
+app.use('/pdfs', pdfRoutes);
 
 const io = new Server(server, {
     cors: {
@@ -285,3 +287,25 @@ server.listen(PORT, () => {
     console.log(`🔗 Health check: http://localhost:${PORT}/health`);
     console.log(`🏠 Homepage: http://localhost:${PORT}/`);
 });
+
+// Testing for pdf discovery 
+
+const pdfDiscovery = require('./modules/pdf-discovery');
+   // Initial indexing
+   try {
+     pdfDiscovery.indexPdfs();
+   } catch (error) {
+     console.error('Initial PDF indexing failed:', error);
+   }
+
+   // Schedule indexing every hour
+   setInterval(() => {
+     try {
+         const results = pdfDiscovery.indexPdfs();
+         if (results.added > 0 || results.updated > 0) {
+             console.log(`PDF indexing: ${results.added} added, ${results.updated} updated`);
+         }
+     } catch (error) {
+         console.error('Scheduled PDF indexing failed:', error);
+     }
+   }, 60 * 60 * 1000);

@@ -111,4 +111,27 @@ db.exec(`
     END;
 `);
 
+db.exec(`
+    CREATE TABLE IF NOT EXISTS pdf_documents (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        filename TEXT UNIQUE NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT,
+        slug TEXT UNIQUE NOT NULL,
+        file_size INTEGER,
+        page_count INTEGER,
+        upload_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        downloads INTEGER DEFAULT 0,
+        user_id INTEGER,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+    );
+    
+    CREATE TRIGGER IF NOT EXISTS update_pdf_documents_timestamp
+    AFTER UPDATE ON pdf_documents
+    BEGIN
+        UPDATE pdf_documents SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+    END;
+`);
+
 module.exports = db;

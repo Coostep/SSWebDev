@@ -901,3 +901,174 @@ main {
 .chat-login-note a:hover {
     text-decoration: underline;
 }
+
+/* PDF-specific styles */
+.pdf-badge {
+    display: inline-block;
+    background: #d32f2f;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-left: 0.5rem;
+}
+
+.pdf-embed {
+    width: 100%;
+    height: 600px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 1rem 0;
+}
+
+.pdf-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+.meta-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.meta-label {
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: bold;
+}
+
+.meta-value {
+    font-size: 1rem;
+    color: #333;
+}
+
+/* Upload form styles */
+.file-upload-area {
+    border: 2px dashed #8B4513;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    margin: 1rem 0;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.file-upload-area:hover {
+    background: #f9f9f9;
+    border-color: #A0522D;
+}
+
+.file-upload-area.drag-over {
+    background: #e8f4ff;
+    border-color: #4a90e2;
+}
+
+/* PDF grid view */
+.pdf-grid-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.pdf-thumbnail {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.pdf-thumbnail:hover {
+    transform: translateY(-5px);
+}
+
+.pdf-thumbnail-header {
+    background: #f5f5f5;
+    padding: 1.5rem;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.pdf-icon-large {
+    font-size: 3rem;
+    color: #d32f2f;
+    margin-bottom: 0.5rem;
+}
+
+.pdf-thumbnail-body {
+    padding: 1.5rem;
+}
+
+.pdf-thumbnail-title {
+    font-weight: bold;
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.pdf-thumbnail-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+/* Admin controls */
+.pdf-admin-controls {
+    background: #fff3cd;
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+    border: 1px solid #ffeaa7;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+/* Responsive PDF viewer */
+@media (max-width: 768px) {
+    .pdf-embed {
+        height: 400px;
+    }
+    
+    .pdf-grid-view {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* PDF statistics */
+.pdf-stats {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+}
+
+.stat-box {
+    background: white;
+    padding: 1rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex: 1;
+    min-width: 150px;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #8B4513;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #666;
+}

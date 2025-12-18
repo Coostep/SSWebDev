@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .upload-page {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .upload-title {
+            color: #8B4513;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .upload-form {
+            margin-top: 2rem;
+        }
+        
+        .form-note {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #4a90e2;
+        }
+        
+        .form-note h4 {
+            margin-top: 0;
+            color: #4a90e2;
+        }
+        
+        .file-drop-area {
+            border: 2px dashed #8B4513;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            background: #fff;
+            transition: background-color 0.3s;
+        }
+        
+        .file-drop-area:hover {
+            background: #f9f9f9;
+        }
+        
+        .file-input {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        
+        .file-info {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        
+        .upload-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-cancel:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {{> nav }}
+        <main>
+            <div class="upload-page">
+                <h2 class="upload-title">Upload PDF Document</h2>
+                
+                {{#if error}}
+                    <div class="error-message">{{error}}</div>
+                {{/if}}
+                
+                <div class="form-note">
+                    <h4>📄 PDF Upload Guidelines:</h4>
+                    <ul>
+                        <li>Maximum file size: 50MB</li>
+                        <li>Only PDF files are accepted</li>
+                        <li>Files will be publicly accessible</li>
+                        <li>Provide a clear title and description</li>
+                    </ul>
+                </div>
+                
+                <form action="/pdfs/upload" method="POST" enctype="multipart/form-data" class="upload-form">
+                    <div class="form-group">
+                        <label for="title">PDF Title:*</label>
+                        <input type="text" id="title" name="title" required 
+                               placeholder="Enter a descriptive title for your PDF">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description:</label>
+                        <textarea id="description" name="description" rows="4" 
+                                  placeholder="Provide a brief description of the PDF content..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>PDF File:*</label>
+                        <div class="file-drop-area">
+                            <p>📁 Drag & drop your PDF here or click to browse</p>
+                            <input type="file" id="pdfFile" name="pdfFile" 
+                                   accept=".pdf,application/pdf" required 
+                                   class="file-input">
+                            <p class="file-info">Accepted: PDF files up to 50MB</p>
+                        </div>
+                    </div>
+                    
+                    <div class="upload-actions">
+                        <button type="submit" class="btn btn-primary">Upload PDF</button>
+                        <a href="/pdfs" class="btn btn-cancel">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+        {{> footer }}
+    </div>
+    
+    <script>
+        // File input enhancement
+        const fileInput = document.getElementById('pdfFile');
+        const fileDropArea = document.querySelector('.file-drop-area');
+        
+        fileDropArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const fileName = e.target.files[0].name;
+                const fileSize = (e.target.files[0].size / (1024 * 1024)).toFixed(2);
+                fileDropArea.innerHTML = `
+                    <p><strong>Selected File:</strong> ${fileName}</p>
+                    <p class="file-info">Size: ${fileSize} MB</p>
+                `;
+            }
+        });
+        
+        // Drag and drop support
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileDropArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            fileDropArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            fileDropArea.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+            fileDropArea.style.backgroundColor = '#f0f8ff';
+            fileDropArea.style.borderColor = '#4a90e2';
+        }
+        
+        function unhighlight() {
+            fileDropArea.style.backgroundColor = '';
+            fileDropArea.style.borderColor = '';
+        }
+        
+        fileDropArea.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            fileInput.files = files;
+            
+            if (files.length > 0) {
+                const fileName = files[0].name;
+                const fileSize = (files[0].size / (1024 * 1024)).toFixed(2);
+                fileDropArea.innerHTML = `
+                    <p><strong>Selected File:</strong> ${fileName}</p>
+                    <p class="file-info">Size: ${fileSize} MB</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

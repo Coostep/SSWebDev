@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .pdf-view-page {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pdf-header {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #8B4513;
+        }
+        
+        .pdf-title {
+            color: #333;
+            margin: 0 0 1rem 0;
+            font-size: 2rem;
+        }
+        
+        .pdf-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            padding: 1rem 0;
+            border-top: 1px solid #dee2e6;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .meta-label {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: bold;
+        }
+        
+        .meta-value {
+            font-size: 1rem;
+            color: #333;
+        }
+        
+        .pdf-description {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+            border: 1px solid #dee2e6;
+            line-height: 1.6;
+        }
+        
+        .pdf-actions {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .btn-large {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-view {
+            background: #4a90e2;
+            color: white;
+            flex: 2;
+        }
+        
+        .btn-download {
+            background: #8B4513;
+            color: white;
+            flex: 1;
+        }
+        
+        .pdf-preview {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .preview-title {
+            margin-bottom: 1.5rem;
+            color: #333;
+            font-size: 1.3rem;
+        }
+        
+        .pdf-iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            color: #8B4513;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .pdf-actions {
+                flex-direction: column;
+            }
+            
+            .pdf-iframe {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {{> nav }}
+        <main>
+            <div class="pdf-view-page">
+                <div class="pdf-header">
+                    <h1 class="pdf-title">{{pdf.title}}</h1>
+                    
+                    <div class="pdf-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">File Size:</span>
+                            <span class="meta-value">{{pdf.formatted_size}}</span>
+                        </div>
+                        
+                        <div class="meta-item">
+                            <span class="meta-label">Upload Date:</span>
+                            <span class="meta-value">{{pdf.upload_date}}</span>
+                        </div>
+                        
+                        <div class="meta-item">
+                            <span class="meta-label">Downloads:</span>
+                            <span class="meta-value">{{pdf.downloads}}</span>
+                        </div>
+                        
+                        {{#if pdf.display_name}}
+                            <div class="meta-item">
+                                <span class="meta-label">Uploaded by:</span>
+                                <span class="meta-value">{{pdf.display_name}}</span>
+                            </div>
+                        {{/if}}
+                    </div>
+                    
+                    {{#if pdf.description}}
+                        <div class="pdf-description">
+                            <h3>Description</h3>
+                            <p>{{pdf.description}}</p>
+                        </div>
+                    {{/if}}
+                    
+                    <div class="pdf-actions">
+                        <a href="/pdfs/{{pdf.slug}}/view" class="btn-large btn-view" target="_blank">
+                            📄 View PDF in Browser
+                        </a>
+                        <a href="/pdfs/{{pdf.slug}}/download" class="btn-large btn-download">
+                            ⬇️ Download PDF
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="pdf-preview">
+                    <h3 class="preview-title">PDF Preview</h3>
+                    <iframe 
+                        src="/pdfs/{{pdf.slug}}/view" 
+                        class="pdf-iframe"
+                        title="{{pdf.title}}"
+                    >
+                        <p>Your browser does not support PDF viewing. 
+                        <a href="/pdfs/{{pdf.slug}}/download">Download the PDF instead</a>.</p>
+                    </iframe>
+                </div>
+                
+                <a href="/pdfs" class="back-link">← Back to PDF Library</a>
+            </div>
+        </main>
+        {{> footer }}
+    </div>
+</body>
+</html>

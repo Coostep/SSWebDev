@@ -18,16 +18,17 @@
   },
   "homepage": "https://github.com/Coostep/SSWebDev#readme",
   "dependencies": {
+    "argon2": "^0.41.0",
+    "better-sqlite3": "^11.8.1",
+    "cookie-parser": "^1.4.7",
+    "dompurify": "^3.2.5",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
     "hbs": "^4.2.0",
-    "cookie-parser": "^1.4.7",
-    "better-sqlite3": "^11.8.1",
-    "argon2": "^0.41.0",
-    "socket.io": "^4.8.1",
-    "nodemailer": "^6.9.15",
+    "jsdom": "^25.0.1",
     "marked": "^15.0.7",
-    "dompurify": "^3.2.5",
-    "jsdom": "^25.0.1"
+    "nodemailer": "^6.9.15",
+    "socket.io": "^4.8.1",
+    "multer": "2.0.2"
   }
 }

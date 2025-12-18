@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .pdf-library {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .library-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #8B4513;
+        }
+        
+        .library-title {
+            color: #8B4513;
+            margin: 0;
+        }
+        
+        .upload-btn {
+            background: #8B4513;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .upload-btn:hover {
+            background: #A0522D;
+        }
+        
+        .pdf-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .pdf-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .pdf-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .pdf-header {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .pdf-icon {
+            font-size: 2.5rem;
+            color: #d32f2f;
+            margin-bottom: 0.5rem;
+        }
+        
+        .pdf-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+            margin: 0.5rem 0;
+            line-height: 1.4;
+        }
+        
+        .pdf-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        
+        .pdf-body {
+            padding: 1.5rem;
+        }
+        
+        .pdf-description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+        
+        .pdf-uploader {
+            font-size: 0.9rem;
+            color: #777;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .pdf-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .btn-view, .btn-download {
+            flex: 1;
+            padding: 0.5rem;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        .btn-view {
+            background: #4a90e2;
+            color: white;
+        }
+        
+        .btn-view:hover {
+            background: #357abd;
+        }
+        
+        .btn-download {
+            background: #8B4513;
+            color: white;
+        }
+        
+        .btn-download:hover {
+            background: #A0522D;
+        }
+        
+        .stats-badge {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .no-pdfs {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        
+        .no-pdfs-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #ccc;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 768px) {
+            .pdf-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .library-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {{> nav }}
+        <main>
+            <div class="pdf-library">
+                <div class="library-header">
+                    <h2 class="library-title">📚 PDF Library</h2>
+                    {{#if currentUser}}
+                        <a href="/pdfs/upload" class="upload-btn">Upload PDF</a>
+                    {{/if}}
+                </div>
+                
+                {{#if pdfs.length}}
+                    <div class="pdf-grid">
+                        {{#each pdfs}}
+                            <div class="pdf-card">
+                                <div class="pdf-header">
+                                    <div class="pdf-icon">📄</div>
+                                    <h3 class="pdf-title">{{this.title}}</h3>
+                                    <div class="pdf-meta">
+                                        <span>{{this.formatted_size}}</span>
+                                        <span class="stats-badge">{{this.downloads}} downloads</span>
+                                    </div>
+                                </div>
+                                <div class="pdf-body">
+                                    {{#if this.description}}
+                                        <p class="pdf-description">{{this.description}}</p>
+                                    {{/if}}
+                                    
+                                    {{#if this.display_name}}
+                                        <div class="pdf-uploader">
+                                            Uploaded by: {{this.display_name}}
+                                        </div>
+                                    {{/if}}
+                                    
+                                    <div class="pdf-actions">
+                                        <a href="/pdfs/{{this.slug}}/view" class="btn-view" target="_blank">View</a>
+                                        <a href="/pdfs/{{this.slug}}/download" class="btn-download">Download</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {{/each}}
+                    </div>
+                    
+                    <!-- Pagination -->
+                    {{#if pagination.totalPages}}
+                        <div class="pagination">
+                            {{#if pagination.hasPrev}}
+                                <a href="/pdfs?page={{pagination.prevPage}}" class="btn btn-secondary">← Previous</a>
+                            {{/if}}
+                            
+                            <span>Page {{pagination.page}} of {{pagination.totalPages}}</span>
+                            
+                            {{#if pagination.hasNext}}
+                                <a href="/pdfs?page={{pagination.nextPage}}" class="btn btn-secondary">Next →</a>
+                            {{/if}}
+                        </div>
+                    {{/if}}
+                {{else}}
+                    <div class="no-pdfs">
+                        <div class="no-pdfs-icon">📚</div>
+                        <h3>No PDFs Available</h3>
+                        <p>The PDF library is currently empty.</p>
+                        {{#if currentUser}}
+                            <p><a href="/pdfs/upload" class="btn btn-primary">Upload your first PDF</a></p>
+                        {{/if}}
+                    </div>
+                {{/if}}
+            </div>
+        </main>
+        {{> footer }}
+    </div>
+</body>
+</html>
