@@ -15,6 +15,8 @@ const hbs = require('hbs');
 const app = express();
 const server = http.createServer(app);
 
+app.set('trust proxy', 1);
+
 // Configures Handlebars as the template engine and sets views directory
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
