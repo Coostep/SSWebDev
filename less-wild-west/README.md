@@ -124,8 +124,8 @@ README.md                         # Project documentation
 **Clone the repository:**
 
    ```bash
-   git clone <repository-url>
-   cd wild-west-forum
+   git clone https://github.com/Coostep/SSWebDev
+   cd less-wild-west
    ```
 
 **Install dependencies:**
