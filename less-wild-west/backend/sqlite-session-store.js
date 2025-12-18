@@ -1,4 +1,7 @@
-// sqlite-session-store.js
+/*
+    This sqlite-session-store.js file is for Session store implementation
+    The session store implementation for express-session with automatic cleanup
+*/
 const { Store } = require('express-session');
 const db = require('./database');
 
@@ -7,11 +10,13 @@ class SQLiteStore extends Store {
         super(options);
         this.table = 'sessions';
         
+        // Sets up automatic session cleanup every 15 minutes to remove expired sessions
         setInterval(() => {
             this.cleanup();
         }, 15 * 60 * 1000);
     }
     
+    // Retrieves a session from the database by session ID, checking expiration
     get(sid, callback) {
         try {
             const row = db.prepare(
@@ -28,6 +33,7 @@ class SQLiteStore extends Store {
         }
     }
     
+    // Saves or updates a session in the database with 24-hour expiration
     set(sid, sess, callback) {
         try {
             const expire = Date.now() + (24 * 60 * 60 * 1000); // 24 hours
@@ -43,6 +49,7 @@ class SQLiteStore extends Store {
         }
     }
     
+    // Deletes a session from the database when user logs out or session is invalidated
     destroy(sid, callback) {
         try {
             db.prepare(`DELETE FROM ${this.table} WHERE sid = ?`).run(sid);
@@ -52,6 +59,7 @@ class SQLiteStore extends Store {
         }
     }
     
+    // Removes expired sessions from the database to maintain performance and storage
     cleanup() {
         try {
             const result = db.prepare(
@@ -66,6 +74,7 @@ class SQLiteStore extends Store {
         }
     }
     
+    // Placeholder close method for interface compatibility (SQLite doesn't require explicit closing)
     close() {
 
     }

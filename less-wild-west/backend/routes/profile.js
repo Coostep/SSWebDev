@@ -9,6 +9,7 @@ const { requireAuth } = require('../middleware/auth');
 const passwordUtils = require('../modules/password-utils');
 const emailService = require('../modules/email-service');
 
+// Renders the user's profile page with their information and recent comment history
 router.get('/', requireAuth, (req, res) => {
     const userId = req.session.user.id;
     
@@ -40,6 +41,7 @@ router.get('/', requireAuth, (req, res) => {
     }
 });
 
+// Updates user password with validation and requires re-login after successful change
 router.post('/password', requireAuth, async (req, res) => {
     try {
         const { currentPassword, newPassword, confirmPassword } = req.body;
@@ -81,6 +83,7 @@ router.post('/password', requireAuth, async (req, res) => {
     }
 });
 
+// Updates user email address with verification and sends confirmation email
 router.post('/email', requireAuth, async (req, res) => {
     try {
         const { currentPassword, newEmail, confirmEmail } = req.body;
@@ -126,6 +129,7 @@ router.post('/email', requireAuth, async (req, res) => {
     }
 });
 
+// Updates user display name with validation to prevent duplicates with username
 router.post('/display-name', requireAuth, (req, res) => {
     try {
         const { displayName } = req.body;
@@ -150,6 +154,7 @@ router.post('/display-name', requireAuth, (req, res) => {
     }
 });
 
+// Updates user profile customization options including color, icon, and bio
 router.post('/customization', requireAuth, (req, res) => {
     try {
         const { profileColor, profileIcon, bio } = req.body;

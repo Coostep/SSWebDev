@@ -4,7 +4,6 @@
 */
 const argon2 = require('argon2');
 
-
 const ARGON2_OPTIONS = {
     type: argon2.argon2id,
     memoryCost: 65536,      
@@ -12,6 +11,7 @@ const ARGON2_OPTIONS = {
     parallelism: 4          
 };
 
+// Validates password strength based on length, character types, and complexity requirements
 function validatePassword(password) {
     const errors = [];
     
@@ -46,10 +46,12 @@ function validatePassword(password) {
     };
 }
 
+// Creates a secure password hash using Argon2 algorithm with configured memory and time costs
 async function hashPassword(password) {
     return await argon2.hash(password, ARGON2_OPTIONS);
 }
 
+// Compares a plain text password against stored hash using Argon2 verification
 async function comparePassword(password, hash) {
     try {
         return await argon2.verify(hash, password);
@@ -59,6 +61,7 @@ async function comparePassword(password, hash) {
     }
 }
 
+// Generates a cryptographically secure random token for password reset functionality
 function generateResetToken() {
     return require('crypto').randomBytes(32).toString('hex');
 }

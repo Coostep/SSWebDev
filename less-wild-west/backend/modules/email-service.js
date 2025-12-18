@@ -4,6 +4,7 @@
 
 const nodemailer = require('nodemailer');
 
+// Creates a nodemailer transporter configured for Gmail SMTP service
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -12,7 +13,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-
+// Sends password reset email with token-based reset link and expiration warning
 async function sendPasswordResetEmail(to, username, resetToken, resetUrl) {
     const expiryHours = 1; 
     // Technically this is html so I used AI
@@ -97,6 +98,7 @@ async function sendPasswordResetEmail(to, username, resetToken, resetUrl) {
     }
 }
 
+// Sends confirmation email when user updates their email address with security notice
 async function sendEmailConfirmation(to, username) {
     // Same with this
     const mailOptions = {

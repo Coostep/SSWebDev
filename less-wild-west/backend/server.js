@@ -15,15 +15,18 @@ const hbs = require('hbs');
 const app = express();
 const server = http.createServer(app);
 
+// Configures Handlebars as the template engine and sets views directory
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 
+// Registers Handlebars helper to truncate long strings with ellipsis for display
 hbs.registerHelper('truncate', function(str, len) {
     if (typeof str !== 'string') return '';
     if (str.length <= len) return str;
     return str.substring(0, len) + '...';
 });
 
+// Formats dates to readable string with month, day, year, and time
 hbs.registerHelper('formatDate', function(dateString) {
     if (!dateString) return '';
     try {
@@ -39,6 +42,8 @@ hbs.registerHelper('formatDate', function(dateString) {
         return dateString;
     }
 });
+
+// Formats time to 12-hour format with hour and minute only
 hbs.registerHelper('formatTime', function(dateString) {
     if (!dateString) return '';
     try {
@@ -52,6 +57,7 @@ hbs.registerHelper('formatTime', function(dateString) {
     }
 });
 
+// Formats chat timestamps with relative display (time only, day of week, or full date)
 hbs.registerHelper('formatChatTime', function(dateString) {
     if (!dateString) return '';
     try {
@@ -86,24 +92,28 @@ hbs.registerHelper('formatChatTime', function(dateString) {
     }
 });
 
+// Helper for equality comparison in Handlebars templates
 hbs.registerHelper('eq', function(a, b, options) {
     return a === b ? options.fn(this) : options.inverse(this);
 });
 
+// Alternative equality helper with different syntax for template logic
 hbs.registerHelper('if_eq', function(a, b, options) {
     return a === b ? options.fn(this) : options.inverse(this);
 });
 
+// Greater than comparison helper for template conditionals
 hbs.registerHelper('gt', function(a, b) {
     return a > b;
 });
 
+// Extracts substring from string for template display purposes
 hbs.registerHelper('substring', function(str, start, end) {
     if (typeof str !== 'string') return '';
     return str.substring(start, end);
 });
 
-
+// Registers Handlebars partials from the specified directory
 hbs.registerPartials(path.join(__dirname, 'views', 'partials'));
 
 const db = require('./database');
@@ -117,11 +127,13 @@ const passwordRoutes = require('./routes/password-recovery');
 const chatRoutes = require('./routes/chat');
 const pdfRoutes = require('./routes/pdfs');
 
+// Sets up middleware for JSON parsing, URL encoding, cookies, and static files
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Configures session management with SQLite storage and security settings
 const sessionStore = new SQLiteStore();
 const sessionMiddleware = session({
     store: sessionStore,
@@ -138,13 +150,14 @@ const sessionMiddleware = session({
 
 app.use(sessionMiddleware);
 
+// Middleware to make user session data available in all templates
 app.use((req, res, next) => {
     res.locals.currentUser = req.session.user || null;
     res.locals.sessionId = req.sessionID;
     next();
 });
 
-
+// Health check endpoint for monitoring server and database status
 app.get('/health', (req, res) => {
     try {
         const dbCheck = db.prepare('SELECT 1 as status').get();
@@ -166,6 +179,7 @@ app.get('/health', (req, res) => {
     }
 });
 
+// Renders the home page with features list and user information
 app.get('/', (req, res) => {
     res.render('home', {
         title: 'Wild West Forum',
@@ -181,6 +195,7 @@ app.get('/', (req, res) => {
     });
 });
 
+// Registers all route modules for different parts of the application
 app.use('/', authRoutes);
 app.use('/comments', commentRoutes);
 app.use('/profile', profileRoutes);
@@ -188,6 +203,7 @@ app.use('/password', passwordRoutes);
 app.use('/chat', chatRoutes);
 app.use('/pdfs', pdfRoutes);
 
+// Initializes Socket.IO for real-time chat with session integration
 const io = new Server(server, {
     cors: {
         origin: "*",
@@ -197,6 +213,7 @@ const io = new Server(server, {
 
 io.engine.use(sessionMiddleware);
 
+// Handles WebSocket connections for real-time chat functionality
 io.on('connection', (socket) => {
     const session = socket.request.session;
 
@@ -252,6 +269,7 @@ io.on('connection', (socket) => {
     });
 });
 
+// 404 error handler for undefined routes
 app.use((req, res) => {
     res.status(404).render('404', {
         title: '404 - Page Not Found',
@@ -260,6 +278,7 @@ app.use((req, res) => {
     });
 });
 
+// Global error handler for server errors and exceptions
 app.use((err, req, res, next) => {
     console.error('Server error:', err);
     res.status(500).render('error', {
@@ -269,6 +288,7 @@ app.use((err, req, res, next) => {
     });
 });
 
+// Graceful shutdown handler for SIGINT signal (Ctrl+C)
 process.on('SIGINT', () => {
     console.log('\nShutting down gracefully...');
     sessionStore.close();
@@ -279,17 +299,13 @@ process.on('SIGINT', () => {
     });
 });
 
+// Starts the HTTP server and logs startup information
 const PORT = 3000;
 server.listen(PORT, () => {
-    console.log(`🚀 Wild West Forum running on port ${PORT}`);
-    console.log(`📁 Database: ${process.env.DB_PATH || './forum.db'}`);
-    console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🔗 Health check: http://localhost:${PORT}/health`);
-    console.log(`🏠 Homepage: http://localhost:${PORT}/`);
+    console.log(`Wild West Forum running on port ${PORT}`);
 });
 
-// Testing for pdf discovery 
-
+// PDF discovery and indexing system for automatic PDF file management
 const pdfDiscovery = require('./modules/pdf-discovery');
    // Initial indexing
    try {

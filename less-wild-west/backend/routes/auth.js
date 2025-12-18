@@ -10,6 +10,7 @@ const loginTracker = require('../modules/login-tracker');
 const { checkLoginLockout, getClientIP } = require('../middleware/auth');
 const markdownParser = require('../modules/markdown-parser');
 
+// Renders the login page if user is not already logged in
 router.get('/login', (req, res) => {
     if (req.session.user) {
         return res.redirect('/');
@@ -20,6 +21,7 @@ router.get('/login', (req, res) => {
     });
 });
 
+// Processes login form submission with security checks and lockout prevention
 router.post('/login', checkLoginLockout, async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -108,6 +110,7 @@ router.post('/login', checkLoginLockout, async (req, res) => {
     }
 });
 
+// Renders the registration page if user is not already logged in
 router.get('/register', (req, res) => {
     if (req.session.user) {
         return res.redirect('/');
@@ -118,6 +121,7 @@ router.get('/register', (req, res) => {
     });
 });
 
+// Processes registration form submission with validation and user creation
 router.post('/register', async (req, res) => {
     try {
         const { username, email, displayName, password, confirmPassword } = req.body;
@@ -198,6 +202,7 @@ router.post('/register', async (req, res) => {
     }
 });
 
+// Handles user logout by destroying session and redirecting to home
 router.post('/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {

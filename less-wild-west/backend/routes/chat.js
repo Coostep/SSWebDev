@@ -6,6 +6,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database');
 
+// Renders the main chat interface with recent messages and user information
 router.get('/', (req, res) => {
     try {
         let messages = [];
@@ -47,6 +48,7 @@ router.get('/', (req, res) => {
     }
 });
 
+// Returns paginated chat history as JSON for authenticated users with limit and before parameters
 router.get('/history', (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ 
@@ -92,6 +94,7 @@ router.get('/history', (req, res) => {
     }
 });
 
+// Returns list of currently online users (placeholder implementation for future enhancement)
 router.get('/online', (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ 

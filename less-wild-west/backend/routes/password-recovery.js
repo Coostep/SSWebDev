@@ -8,6 +8,7 @@ const db = require('../database');
 const passwordUtils = require('../modules/password-utils');
 const emailService = require('../modules/email-service');
 
+// Renders the forgot password page where users can request a password reset
 router.get('/forgot', (req, res) => {
     res.render('forgot-password', {
         title: 'Forgot Password - Wild West Forum',
@@ -16,6 +17,7 @@ router.get('/forgot', (req, res) => {
     });
 });
 
+// Processes forgot password request, generates reset token, and sends reset email
 router.post('/forgot', async (req, res) => {
     try {
         const { email } = req.body;
@@ -65,6 +67,7 @@ router.post('/forgot', async (req, res) => {
     }
 });
 
+// Validates reset token and renders password reset form if token is valid
 router.get('/reset/:token', (req, res) => {
     const { token } = req.params;
     
@@ -103,6 +106,7 @@ router.get('/reset/:token', (req, res) => {
     }
 });
 
+// Processes password reset form, updates password, and invalidates reset token
 router.post('/reset/:token', async (req, res) => {
     const { token } = req.params;
     const { password, confirmPassword } = req.body;

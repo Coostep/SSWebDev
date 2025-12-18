@@ -8,7 +8,7 @@ const db = require('../database');
 const { requireAuth } = require('../middleware/auth');
 const markdownParser = require('../modules/markdown-parser');
 
-
+// Renders paginated comments with nested replies and reply counts for the main forum view
 router.get('/', (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
@@ -82,6 +82,7 @@ router.get('/', (req, res) => {
     }
 });
 
+// Renders new comment creation form with optional parent ID for replying to existing comments
 router.get('/new', requireAuth, (req, res) => {
     res.render('new-comment', {
         title: 'New Comment - Wild West Forum',
@@ -89,6 +90,7 @@ router.get('/new', requireAuth, (req, res) => {
     });
 });
 
+// Creates a new comment with markdown parsing and optional parent relationship for replies
 router.post('/', requireAuth, async (req, res) => {
     try {
         const { text, parentId } = req.body;
@@ -124,6 +126,7 @@ router.post('/', requireAuth, async (req, res) => {
     }
 });
 
+// Handles comment voting with toggle functionality and prevents duplicate votes from same user
 router.post('/:id/vote', requireAuth, (req, res) => {
     try {
         const { vote } = req.body;
@@ -186,6 +189,7 @@ router.post('/:id/vote', requireAuth, (req, res) => {
     }
 });
 
+// Renders edit form for a comment after verifying ownership and comment existence
 router.get('/:id/edit', requireAuth, (req, res) => {
     try {
         const commentId = req.params.id;
@@ -225,6 +229,7 @@ router.get('/:id/edit', requireAuth, (req, res) => {
     }
 });
 
+// Updates an existing comment with new markdown-parsed content and timestamps the edit
 router.post('/:id/edit', requireAuth, async (req, res) => {
     try {
         const commentId = req.params.id;
@@ -270,6 +275,7 @@ router.post('/:id/edit', requireAuth, async (req, res) => {
     }
 });
 
+// Deletes a comment after verifying ownership and returns JSON response for AJAX requests
 router.post('/:id/delete', requireAuth, (req, res) => {
     try {
         const commentId = req.params.id;

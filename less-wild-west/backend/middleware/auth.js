@@ -6,6 +6,7 @@
 
 const loginTracker = require('../modules/login-tracker');
 
+// Middleware that checks if user is authenticated via session; returns 401 if not
 function requireAuth(req, res, next) {
     if (req.session && req.session.user) {
         next();
@@ -17,6 +18,7 @@ function requireAuth(req, res, next) {
     }
 }
 
+// Checks login lockout status for client IP/username to prevent brute-force attacks
 function checkLoginLockout(req, res, next) {
     const ipAddress = getClientIP(req);
     const username = req.body?.username;
@@ -38,6 +40,7 @@ function checkLoginLockout(req, res, next) {
     next();
 }
 
+// Extracts client IP address from request headers and connection properties
 function getClientIP(req) {
     return req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 
            req.ip || 

@@ -7,12 +7,15 @@
 const Database = require('better-sqlite3');
 const path = require('path');
 
+// Initialize SQLite database connection with path configuration
 const dbPath = process.env.DB_PATH || path.join(__dirname, 'forum.db');
 const db = new Database(dbPath);
 
+// Configure database settings for foreign key support and write-ahead logging
 db.pragma('foreign_keys = ON');
 db.pragma('journal_mode = WAL');
 
+// Creates all required database tables if they don't already exist with appropriate indexes
 db.exec(`
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -97,6 +100,7 @@ db.exec(`
     );
 `);
 
+// Creates automatic timestamp update triggers for users and comments tables
 db.exec(`
     CREATE TRIGGER IF NOT EXISTS update_users_timestamp 
     AFTER UPDATE ON users 
@@ -111,6 +115,7 @@ db.exec(`
     END;
 `);
 
+// Creates table for PDF document storage with metadata and download tracking
 db.exec(`
     CREATE TABLE IF NOT EXISTS pdf_documents (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

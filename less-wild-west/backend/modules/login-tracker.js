@@ -8,6 +8,7 @@ const db = require('../database');
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes
 
+// Records a login attempt (success or failure) for tracking and security monitoring
 function recordAttempt(ipAddress, username, success) {
     try {
         const stmt = db.prepare(`
@@ -20,6 +21,7 @@ function recordAttempt(ipAddress, username, success) {
     }
 }
 
+// Checks if an IP/username combination is currently locked out due to too many failed attempts
 function checkLockout(ipAddress, username) {
     try {
         const cutoffTime = Date.now() - LOCKOUT_DURATION;
@@ -58,7 +60,7 @@ function checkLockout(ipAddress, username) {
     }
 }
 
-
+// Removes old login attempts from database to prevent table from growing indefinitely
 function cleanupOldAttempts() {
     try {
         const cutoffTime = Date.now() - LOCKOUT_DURATION;
@@ -76,6 +78,7 @@ function cleanupOldAttempts() {
     }
 }
 
+// Periodically cleans up old login attempts every hour to maintain database performance
 setInterval(() => {
     const deleted = cleanupOldAttempts();
     if (deleted > 0) {
