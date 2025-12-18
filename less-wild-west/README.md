@@ -125,7 +125,7 @@ README.md                         # Project documentation
 
    ```bash
    git clone https://github.com/Coostep/SSWebDev
-   cd less-wild-west
+   cd less-wild-west/backend
    ```
 
 **Install dependencies:**
