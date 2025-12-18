@@ -7,7 +7,7 @@ const fs = require('fs');  // Regular fs module
 const path = require('path');
 const db = require('../database');
 
-const PDF_DIR = path.join(__dirname, '/pdfs');
+const PDF_DIR = path.join(__dirname, '../pdfs');
 
 // Cache for PDF discovery results
 let pdfCache = {
