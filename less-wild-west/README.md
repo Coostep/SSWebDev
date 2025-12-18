@@ -120,7 +120,7 @@ README.md                         # Project documentation
 ```
 # Run Instructions
 
-# Environment Setup
+## Environment Setup
 **Clone the repository:**
 
    ```bash
@@ -144,7 +144,7 @@ README.md                         # Project documentation
    ```
 # Database Schema Documentation
 **users**
-   id INTEGER PRIMARY KEY AUTOINCREMENT
+   ```id INTEGER PRIMARY KEY AUTOINCREMENT
    username TEXT UNIQUE NOT NULL
    email TEXT UNIQUE NOT NULL
    display_name TEXT NOT NULL
@@ -156,9 +156,9 @@ README.md                         # Project documentation
    failed_login_attempts INTEGER DEFAULT 0
    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-
+   ```
 **comments**
-   id INTEGER PRIMARY KEY AUTOINCREMENT
+   ```id INTEGER PRIMARY KEY AUTOINCREMENT
    user_id INTEGER NOT NULL
    text TEXT NOT NULL
    text_html TEXT NOT NULL
@@ -169,9 +169,9 @@ README.md                         # Project documentation
    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
    FOREIGN KEY (parent_id) REFERENCES comments(id) ON DELETE CASCADE
-
+   ```
 **comment_votes**
-   id INTEGER PRIMARY KEY AUTOINCREMENT
+   ```id INTEGER PRIMARY KEY AUTOINCREMENT
    comment_id INTEGER NOT NULL
    user_id INTEGER NOT NULL
    vote INTEGER CHECK(vote IN (-1, 1))
@@ -179,32 +179,32 @@ README.md                         # Project documentation
    UNIQUE(comment_id, user_id)
    FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE
    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-
+   ```
 **login_attempts**
-   id INTEGER PRIMARY KEY AUTOINCREMENT
+   ```id INTEGER PRIMARY KEY AUTOINCREMENT
    ip_address TEXT NOT NULL
    username TEXT NOT NULL
    success INTEGER DEFAULT 0
    attempt_time DATETIME DEFAULT CURRENT_TIMESTAMP
-   
+   ```
 **password_reset_tokens**
-   id INTEGER PRIMARY KEY AUTOINCREMENT
+   ```id INTEGER PRIMARY KEY AUTOINCREMENT
    user_id INTEGER NOT NULL
    token TEXT UNIQUE NOT NULL
    expires_at DATETIME NOT NULL
    used INTEGER DEFAULT 0
    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-
+   ```
 **chat_messages**
-   id INTEGER PRIMARY KEY AUTOINCREMENT
+   ```id INTEGER PRIMARY KEY AUTOINCREMENT
    user_id INTEGER NOT NULL
    message TEXT NOT NULL
    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-
+   ```
 **pdf_documents**
-   id INTEGER PRIMARY KEY AUTOINCREMENT
+   ```id INTEGER PRIMARY KEY AUTOINCREMENT
    filename TEXT UNIQUE NOT NULL
    title TEXT NOT NULL
    description TEXT
@@ -216,15 +216,15 @@ README.md                         # Project documentation
    downloads INTEGER DEFAULT 0
    user_id INTEGER
    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
-
+   ```
 **sessions**
-   sid TEXT PRIMARY KEY
+   ```sid TEXT PRIMARY KEY
    sess TEXT NOT NULL
    expire INTEGER NOT NULL
+   ```
+# Available Routes
 
-## Available Routes
-
-# Public Routes
+## Public Routes
    GET / - Home page with feature overview
 
    GET /comments - View all comments with pagination
@@ -243,7 +243,7 @@ README.md                         # Project documentation
 
    GET /pdfs - PDF document library
 
-# Authentication Routes
+## Authentication Routes
 
    POST /login - Authenticate user and create session
 
@@ -251,7 +251,7 @@ README.md                         # Project documentation
 
    POST /logout - Clear session and logout
 
-# Comment Routes
+## Comment Routes
 
    GET /comments/new - Create new comment form
 
@@ -265,7 +265,7 @@ README.md                         # Project documentation
 
    POST /comments/:id/delete - Delete comment
 
-# Profile Routes
+## Profile Routes
 
    GET /profile - User profile page
 
@@ -277,19 +277,19 @@ README.md                         # Project documentation
 
    POST /profile/customization - Update profile customization
 
-# Password Recovery Routes
+## Password Recovery Routes
 
    POST /password/forgot - Request password reset email
 
    POST /password/reset/:token - Submit new password
 
-# Chat Routes
+## Chat Routes
 
    GET /chat/history - Get chat history
 
    GET /chat/online - Get online users
 
-# PDF Routes
+## PDF Routes
 
    GET /pdfs - Browse PDF documents
 
